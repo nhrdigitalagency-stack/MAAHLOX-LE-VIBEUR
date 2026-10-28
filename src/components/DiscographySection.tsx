@@ -17,7 +17,6 @@ import {
   ReleaseProject,
   releasesData,
 } from '../data/releases';
-import { DecorativeAudioVisualizer } from './DecorativeAudioVisualizer';
 import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
@@ -374,11 +373,6 @@ export const DiscographySection: React.FC = () => {
               </div>
             </article>
           ))}
-        </div>
-
-        {/* Visualiseur audio décoratif (Canvas) */}
-        <div className="mb-16">
-          <DecorativeAudioVisualizer variant="studio-panel" />
         </div>
 
         {/* CATALOGUE CHRONOLOGIQUE COMPLET (11 PÉRIODES · 2012 – 2026) */}

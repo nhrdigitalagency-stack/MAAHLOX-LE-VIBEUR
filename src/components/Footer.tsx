@@ -11,7 +11,6 @@ import {
 import { siteConfig } from '../data/siteConfig';
 import { artistData } from '../data/artist';
 import { getActivePublicSocials, SocialPlatformId } from '../data/socials';
-import { DecorativeAudioVisualizer } from './DecorativeAudioVisualizer';
 import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
@@ -41,11 +40,6 @@ export const Footer: React.FC = () => {
       className="theme-bg pt-16 pb-12 border-t theme-border transition-colors duration-250 font-poppins"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
-        {/* Bandeau visualiseur audio décoratif d'ambiance studio dans le pied de page */}
-        <div className="mb-12">
-          <DecorativeAudioVisualizer variant="footer-strip" />
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b theme-border">
           {/* Colonne 1 : Wordmark typographique */}
           <div className="md:col-span-5 space-y-4">
