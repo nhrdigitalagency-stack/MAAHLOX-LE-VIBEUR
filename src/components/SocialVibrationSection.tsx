@@ -6,7 +6,7 @@ import {
   getActivePublicSocials,
   getPendingVerificationSocials,
 } from '../data/socials';
-import { SocialBrandLogo } from './SocialBrandLogo';
+import { BRAND_HEX_COLORS, SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -85,77 +85,96 @@ export const SocialVibrationSection: React.FC = () => {
 
         {/* Cartes sociales asymétriques — chaque carte est une vraie ancre HTML <a> avec le logo du réseau social */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {activeSocials.map((social, idx) => (
-            <a
-              key={social.id}
-              href={social.url || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${social.label[language]} — ${
-                social.statusBadge[language]
-              } (${
-                language === 'fr'
-                  ? 's’ouvre dans un nouvel onglet'
-                  : 'opens in a new tab'
-              })`}
-              className={`social-vibration-card ${social.cardSpanClass} group block p-6 md:p-8 theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-250 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-[#FF5A1F]`}
-            >
-              <div className="flex items-start justify-between gap-4 mb-8">
-                <div className="inline-flex items-center gap-3.5">
-                  <span className="inline-flex items-center justify-center w-12 h-12 theme-bg border theme-border-strong theme-text group-hover:text-[#FF5A1F] group-hover:border-[#FF5A1F] transition-colors duration-200 shrink-0">
-                    <SocialBrandLogo
-                      platform={social.platform}
-                      className="w-6 h-6"
-                    />
-                  </span>
-                  <div>
-                    <span className="block text-xs font-semibold uppercase tracking-widest theme-muted">
-                      0{idx + 1} · {social.platformName}
-                    </span>
-                    <span className="block text-xs theme-accent-text font-medium mt-0.5">
-                      {social.statusBadge[language]}
-                    </span>
-                  </div>
-                </div>
+          {activeSocials.map((social, idx) => {
+            const brandHex = BRAND_HEX_COLORS[social.platform];
 
-                {/* Flèche externe discrète avec léger déplacement au survol */}
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium theme-muted group-hover:text-[#FF5A1F] transition-colors duration-200">
-                  <span className="hidden sm:inline">
-                    {language === 'fr' ? 'Lien externe' : 'External link'}
-                  </span>
-                  <ArrowUpRight
-                    className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    aria-hidden="true"
-                  />
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="font-display text-3xl md:text-4xl theme-text group-hover:text-[#FF5A1F] transition-colors duration-200 tracking-wide">
-                  {social.label[language]}
-                </h3>
-                <p className="text-sm theme-muted leading-relaxed max-w-2xl">
-                  {social.editorialDescription[language]}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t theme-border flex flex-wrap items-center justify-between gap-2 text-xs theme-muted">
-                <span className="inline-flex items-center gap-2 font-medium theme-text">
+            return (
+              <a
+                key={social.id}
+                href={social.url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${social.label[language]} — ${
+                  social.statusBadge[language]
+                } (${
+                  language === 'fr'
+                    ? 's’ouvre dans un nouvel onglet'
+                    : 'opens in a new tab'
+                })`}
+                className={`social-vibration-card ${social.cardSpanClass} relative overflow-hidden group block p-6 md:p-8 theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-250 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-[#FF5A1F]`}
+              >
+                {/* Filigrane géant du logo officiel en arrière-plan de la carte */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-6 -bottom-6 opacity-[0.045] group-hover:opacity-[0.11] transition-all duration-300 group-hover:scale-105"
+                  style={{ color: brandHex }}
+                >
                   <SocialBrandLogo
                     platform={social.platform}
-                    className="w-3.5 h-3.5 theme-accent-text"
+                    className="w-40 h-40"
                   />
-                  <span>{social.handleOrChannel}</span>
-                </span>
-                <span className="truncate max-w-[280px] sm:max-w-md opacity-75">
-                  {social.url}
-                </span>
-              </div>
-            </a>
-          ))}
+                </div>
+
+                <div className="relative z-10 flex items-start justify-between gap-4 mb-8">
+                  <div className="inline-flex items-center gap-4">
+                    {/* Médaillon logo officiel avec accent de la plateforme */}
+                    <span className="relative inline-flex items-center justify-center w-14 h-14 theme-bg border theme-border-strong group-hover:border-[#FF5A1F] transition-colors duration-200 shrink-0 shadow-md">
+                      <SocialBrandLogo
+                        platform={social.platform}
+                        useBrandColor
+                        className="w-7 h-7 transition-transform duration-200 group-hover:scale-110"
+                      />
+                    </span>
+                    <div>
+                      <span className="block text-xs font-semibold uppercase tracking-widest theme-muted">
+                        0{idx + 1} · {social.platformName}
+                      </span>
+                      <span className="block text-xs theme-accent-text font-medium mt-0.5">
+                        {social.statusBadge[language]}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Flèche externe discrète avec léger déplacement au survol */}
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 theme-bg border theme-border text-xs font-medium theme-muted group-hover:text-[#FF5A1F] group-hover:border-[#FF5A1F] transition-colors duration-200">
+                    <span className="hidden sm:inline">
+                      {language === 'fr' ? 'Ouvrir' : 'Open'}
+                    </span>
+                    <ArrowUpRight
+                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </div>
+
+                <div className="relative z-10 space-y-2">
+                  <h3 className="font-display text-3xl md:text-4xl theme-text group-hover:text-[#FF5A1F] transition-colors duration-200 tracking-wide">
+                    {social.label[language]}
+                  </h3>
+                  <p className="text-sm theme-muted leading-relaxed max-w-2xl">
+                    {social.editorialDescription[language]}
+                  </p>
+                </div>
+
+                <div className="relative z-10 mt-6 pt-4 border-t theme-border flex flex-wrap items-center justify-between gap-2 text-xs theme-muted">
+                  <span className="inline-flex items-center gap-2 font-semibold theme-text">
+                    <SocialBrandLogo
+                      platform={social.platform}
+                      useBrandColor
+                      className="w-4 h-4"
+                    />
+                    <span>{social.handleOrChannel}</span>
+                  </span>
+                  <span className="truncate max-w-[280px] sm:max-w-md opacity-75">
+                    {social.url}
+                  </span>
+                </div>
+              </a>
+            );
+          })}
         </div>
 
-        {/* En mode preview uniquement : transparence sur Instagram candidat et TikTok non confirmé (sans afficher l'icône TikTok comme exigé) */}
+        {/* En mode preview uniquement : transparence sur Instagram candidat et TikTok non confirmé (sans afficher l'icône TikTok tant que l'URL n'est pas fournie) */}
         {environmentMode === 'preview' && pendingSocials.length > 0 && (
           <div className="mt-8 p-5 md:p-6 theme-surface border theme-border space-y-4">
             <div className="flex items-start gap-3">
@@ -181,15 +200,18 @@ export const SocialVibrationSection: React.FC = () => {
               {pendingSocials.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 theme-bg border theme-border text-xs space-y-1.5"
+                  className="p-4 theme-bg border theme-border text-xs space-y-2"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-2 font-semibold theme-text">
+                    <span className="inline-flex items-center gap-2.5 font-semibold theme-text">
                       {item.platform === 'instagram' && (
-                        <SocialBrandLogo
-                          platform="instagram"
-                          className="w-4 h-4 theme-accent-text"
-                        />
+                        <span className="inline-flex items-center justify-center w-7 h-7 theme-surface border theme-border">
+                          <SocialBrandLogo
+                            platform="instagram"
+                            useBrandColor
+                            className="w-4 h-4"
+                          />
+                        </span>
                       )}
                       <span>{item.platformName}</span>
                     </span>

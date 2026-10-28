@@ -101,38 +101,43 @@ export const HeroSection: React.FC = () => {
             width={1920}
             height={1080}
             onError={() => setImageError(true)}
-            className="h-full w-full object-cover object-[54%_18%] opacity-85 contrast-[1.05] saturate-[1.06] transition-opacity duration-300"
+            className="h-full w-full object-cover object-[56%_18%] opacity-75 contrast-[1.06] saturate-[1.04] transition-opacity duration-300"
           />
         )}
 
-        {/* Superposition d'arrière-plan à opacité réduite : protège la lisibilité à gauche tout en dégageant l'artiste au centre/droite */}
+        {/* 1. Scrim directionnel principal à couverture étendue : garantit la lisibilité parfaite du texte à gauche et au centre */}
         <div
           aria-hidden="true"
           className="absolute inset-0 transition-colors duration-300"
           style={{
             background:
-              'linear-gradient(90deg, var(--hero-scrim-start) 0%, var(--hero-scrim-mid) 44%, var(--hero-scrim-end) 100%)',
+              'linear-gradient(102deg, var(--hero-scrim-start) 0%, rgba(8, 8, 8, 0.88) 36%, var(--hero-scrim-mid) 64%, var(--hero-scrim-end) 100%)',
           }}
         />
+
+        {/* 2. Scrim vertical d'ancrage haut/bas : protège le Header Bubble en haut et la barre éditoriale en bas */}
         <div
           aria-hidden="true"
           className="absolute inset-0 transition-colors duration-300"
           style={{
             background:
-              'linear-gradient(to top, var(--hero-scrim-bottom) 0%, rgba(8, 8, 8, 0.12) 38%, rgba(8, 8, 8, 0.08) 72%, var(--hero-scrim-top) 100%)',
+              'linear-gradient(180deg, var(--hero-scrim-top) 0%, rgba(8, 8, 8, 0.38) 35%, rgba(8, 8, 8, 0.48) 68%, var(--hero-scrim-bottom) 100%)',
           }}
         />
+
+        {/* 3. Halo radial sombre de protection typographique sous la colonne éditoriale gauche + lueur scénique ambrée à droite */}
         <div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(circle at 65% 32%, rgba(255, 90, 31, 0.12) 0%, transparent 65%)',
+              'radial-gradient(ellipse 68% 75% at 24% 54%, rgba(8, 8, 8, 0.72) 0%, transparent 75%), radial-gradient(circle at 72% 32%, rgba(255, 90, 31, 0.14) 0%, transparent 62%)',
           }}
         />
 
         {/* Effet signature 2 : Vibration lumineuse discrète sans flashes */}
         <StageVibrationCanvas />
+        <div className="film-grain absolute inset-0" aria-hidden="true" />
       </div>
 
       {/* Barre d'outils d'expérience (Langue FR/EN, Thème Sombre/Clair & Mode Preview/Production) */}

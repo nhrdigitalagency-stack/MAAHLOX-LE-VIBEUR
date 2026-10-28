@@ -1,25 +1,113 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SocialPlatformId } from '../data/socials';
 
+export type SupportedBrandPlatform = SocialPlatformId | 'spotify' | 'deezer';
+
 interface SocialBrandLogoProps {
-  platform: SocialPlatformId | 'spotify' | 'deezer';
+  platform: SupportedBrandPlatform;
   className?: string;
+  useBrandColor?: boolean;
 }
 
+const SIMPLE_ICONS_SLUGS: Record<SupportedBrandPlatform, string> = {
+  youtube: 'youtube',
+  facebook: 'facebook',
+  soundcloud: 'soundcloud',
+  spotify: 'spotify',
+  deezer: 'deezer',
+  instagram: 'instagram',
+  tiktok: 'tiktok',
+};
+
+export const BRAND_HEX_COLORS: Record<SupportedBrandPlatform, string> = {
+  youtube: '#FF0000',
+  facebook: '#1877F2',
+  soundcloud: '#FF5500',
+  spotify: '#1DB954',
+  deezer: '#A238FF',
+  instagram: '#E4405F',
+  tiktok: '#F5F1E8',
+};
+
+// Cache en mémoire des chemins SVG récupérés depuis Simple Icons CDN
+const fetchedSvgPathCache = new Map<SupportedBrandPlatform, string>();
+
 /**
- * Logos vectoriels officiels des réseaux sociaux et plateformes musicales
- * (YouTube, Facebook, SoundCloud, Spotify, Deezer, Instagram, TikTok).
+ * Composant d'icône de plateforme sociale / musicale :
+ * - Récupère dynamiquement le SVG officiel depuis le CDN Simple Icons (`https://cdn.simpleicons.org/<slug>`)
+ *   et extrait son `<path>` vectoriel pour un rendu net et personnalisable.
+ * - Bascule instantanément sur le tracé vectoriel officiel embarqué pendant le chargement ou hors-ligne.
  */
 export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
   platform,
   className = 'w-5 h-5',
+  useBrandColor = false,
 }) => {
+  const [fetchedPathD, setFetchedPathD] = useState<string | null>(
+    () => fetchedSvgPathCache.get(platform) || null
+  );
+
+  useEffect(() => {
+    if (fetchedSvgPathCache.has(platform)) {
+      setFetchedPathD(fetchedSvgPathCache.get(platform)!);
+      return;
+    }
+
+    let isMounted = true;
+    const slug = SIMPLE_ICONS_SLUGS[platform];
+    const controller = new AbortController();
+
+    fetch(`https://cdn.simpleicons.org/${slug}`, {
+      signal: controller.signal,
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('SimpleIcons fetch failed');
+        return res.text();
+      })
+      .then((svgText) => {
+        const match = svgText.match(/<path[^>]*d="([^"]+)"/i);
+        if (match && match[1]) {
+          fetchedSvgPathCache.set(platform, match[1]);
+          if (isMounted) {
+            setFetchedPathD(match[1]);
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback silencieux sur les tracés vectoriels officiels embarqués
+      });
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [platform]);
+
+  const colorStyle = useBrandColor
+    ? { color: BRAND_HEX_COLORS[platform] }
+    : undefined;
+
+  if (fetchedPathD) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        style={colorStyle}
+        className={className}
+        aria-hidden="true"
+      >
+        <path d={fetchedPathD} />
+      </svg>
+    );
+  }
+
   switch (platform) {
     case 'youtube':
       return (
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >
@@ -32,6 +120,7 @@ export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >
@@ -44,6 +133,7 @@ export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >
@@ -56,6 +146,7 @@ export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >
@@ -68,6 +159,7 @@ export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >
@@ -80,6 +172,7 @@ export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >
@@ -93,6 +186,7 @@ export const SocialBrandLogo: React.FC<SocialBrandLogoProps> = ({
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
+          style={colorStyle}
           className={className}
           aria-hidden="true"
         >

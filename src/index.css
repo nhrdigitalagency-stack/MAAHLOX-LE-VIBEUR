@@ -17,11 +17,11 @@ html.dark,
   --border-strong: rgba(245, 241, 232, 0.28);
   --header-scrim: rgba(8, 8, 8, 0.88);
   --modal-backdrop: rgba(8, 8, 8, 0.88);
-  --hero-scrim-start: rgba(8, 8, 8, 0.72);
-  --hero-scrim-mid: rgba(8, 8, 8, 0.36);
-  --hero-scrim-end: rgba(8, 8, 8, 0.14);
-  --hero-scrim-top: rgba(8, 8, 8, 0.42);
-  --hero-scrim-bottom: rgba(8, 8, 8, 0.82);
+  --hero-scrim-start: rgba(8, 8, 8, 0.94);
+  --hero-scrim-mid: rgba(8, 8, 8, 0.68);
+  --hero-scrim-end: rgba(8, 8, 8, 0.38);
+  --hero-scrim-top: rgba(8, 8, 8, 0.78);
+  --hero-scrim-bottom: rgba(8, 8, 8, 0.95);
   --font-display: 'Anton', Impact, sans-serif;
   --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -42,11 +42,11 @@ html.light,
   --border-strong: rgba(18, 17, 16, 0.28);
   --header-scrim: rgba(246, 243, 236, 0.92);
   --modal-backdrop: rgba(18, 17, 16, 0.75);
-  --hero-scrim-start: rgba(8, 8, 8, 0.68);
-  --hero-scrim-mid: rgba(8, 8, 8, 0.30);
-  --hero-scrim-end: rgba(8, 8, 8, 0.10);
-  --hero-scrim-top: rgba(8, 8, 8, 0.35);
-  --hero-scrim-bottom: rgba(8, 8, 8, 0.78);
+  --hero-scrim-start: rgba(8, 8, 8, 0.92);
+  --hero-scrim-mid: rgba(8, 8, 8, 0.64);
+  --hero-scrim-end: rgba(8, 8, 8, 0.35);
+  --hero-scrim-top: rgba(8, 8, 8, 0.74);
+  --hero-scrim-bottom: rgba(8, 8, 8, 0.92);
 }
 
 @layer base {
