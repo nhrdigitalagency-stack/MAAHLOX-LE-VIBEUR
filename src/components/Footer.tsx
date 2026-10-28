@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  ArrowUp,
-  ArrowUpRight,
-  Eye,
-  Globe,
-  Moon,
-  ShieldCheck,
-  Sun,
-} from 'lucide-react';
+import { ArrowUp, ArrowUpRight, Globe, Moon, Sun } from 'lucide-react';
 import { siteConfig } from '../data/siteConfig';
 import { artistData } from '../data/artist';
 import { getActivePublicSocials, SocialPlatformId } from '../data/socials';
@@ -15,14 +7,7 @@ import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 export const Footer: React.FC = () => {
-  const {
-    language,
-    toggleLanguage,
-    theme,
-    toggleTheme,
-    environmentMode,
-    toggleEnvironmentMode,
-  } = useAppSettings();
+  const { language, toggleLanguage, theme, toggleTheme } = useAppSettings();
 
   const activeSocials = getActivePublicSocials();
 
@@ -45,7 +30,7 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-5 space-y-4">
             <a
               href="#top"
-              className="inline-block font-display text-4xl md:text-5xl tracking-wider theme-text hover:text-[#FF5A1F] transition-colors duration-150"
+              className="inline-block font-display text-4xl md:text-5xl tracking-wider theme-text hover:text-[#FF5A1F] hover:translate-x-1 transition-all duration-200"
             >
               MAAHLOX
             </a>
@@ -54,18 +39,18 @@ export const Footer: React.FC = () => {
                 ? `${artistData.stageName} (${artistData.civilName}) — ${artistData.activityFr}, associé au ${artistData.anchorageFr}.`
                 : `${artistData.stageName} (${artistData.civilName}) — ${artistData.activityEn}, associated with ${artistData.anchorageEn}.`}
             </p>
-            <p className="text-xs font-semibold theme-accent-text">
+            <p className="text-xs font-semibold theme-accent-text uppercase tracking-wider">
               {language === 'fr'
                 ? siteConfig.projectStatus.disclaimerFr
                 : siteConfig.projectStatus.disclaimerEn}
             </p>
 
-            {/* Boutons rapides de langue, thème et mode dans le pied de page */}
+            {/* Boutons rapides de langue et thème dans le pied de page */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={toggleLanguage}
-                className="inline-flex items-center gap-2 px-3.5 py-2 border theme-border-strong theme-surface text-xs font-medium theme-text hover:border-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-3.5 py-2 border theme-border-strong theme-surface text-xs font-medium theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
               >
                 <Globe
                   className="w-3.5 h-3.5 theme-accent-text"
@@ -79,7 +64,7 @@ export const Footer: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="inline-flex items-center gap-2 px-3.5 py-2 border theme-border-strong theme-surface text-xs font-medium theme-text hover:border-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-2 px-3.5 py-2 border theme-border-strong theme-surface text-xs font-medium theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
               >
                 {theme === 'dark' ? (
                   <>
@@ -103,33 +88,6 @@ export const Footer: React.FC = () => {
                   </>
                 )}
               </button>
-
-              <button
-                type="button"
-                onClick={toggleEnvironmentMode}
-                className="inline-flex items-center gap-2 px-3.5 py-2 border theme-border-strong theme-surface text-xs font-medium theme-text hover:border-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
-              >
-                {environmentMode === 'preview' ? (
-                  <Eye
-                    className="w-3.5 h-3.5 theme-accent-text"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <ShieldCheck
-                    className="w-3.5 h-3.5 theme-accent-text"
-                    aria-hidden="true"
-                  />
-                )}
-                <span>
-                  {environmentMode === 'preview'
-                    ? language === 'fr'
-                      ? 'Mode : Preview (Démo)'
-                      : 'Mode: Preview (Demo)'
-                    : language === 'fr'
-                    ? 'Mode : Production'
-                    : 'Mode: Production'}
-                </span>
-              </button>
             </div>
           </div>
 
@@ -143,7 +101,7 @@ export const Footer: React.FC = () => {
                 <li key={item.id}>
                   <a
                     href={item.href}
-                    className="theme-text opacity-85 hover:opacity-100 hover:text-[#FF5A1F] transition-colors duration-150"
+                    className="inline-block theme-text opacity-85 hover:opacity-100 hover:text-[#FF5A1F] hover:translate-x-1 transition-all duration-150"
                   >
                     {item.label[language]}
                   </a>
@@ -152,12 +110,12 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Colonne 3 : Réseaux sociaux & présence documentée */}
+          {/* Colonne 3 : Réseaux sociaux & présence en ligne */}
           <div className="md:col-span-4 space-y-3">
             <h2 className="text-xs font-semibold uppercase tracking-widest theme-muted">
               {language === 'fr'
-                ? 'Réseaux sociaux & Présence en ligne'
-                : 'Social Networks & Online Presence'}
+                ? 'Réseaux sociaux & Plateformes'
+                : 'Social Networks & Platforms'}
             </h2>
             <ul className="space-y-3 text-xs theme-muted">
               {activeSocials.map((social) => (
@@ -169,37 +127,38 @@ export const Footer: React.FC = () => {
                     aria-label={`${social.label[language]} (${
                       language === 'fr' ? 'nouvel onglet' : 'new tab'
                     })`}
-                    className="inline-flex items-center gap-2 font-medium theme-text hover:text-[#FF5A1F] transition-colors duration-150"
+                    className="group inline-flex items-center gap-2 font-medium theme-text hover:text-[#FF5A1F] transition-colors duration-150"
                   >
-                    <span className="theme-accent-text">
+                    <span className="text-[#FF5A1F] transition-transform duration-200 group-hover:scale-110">
                       {renderSocialIcon(social.platform)}
                     </span>
                     <span>
                       {social.platformName} — {social.handleOrChannel}
                     </span>
-                    <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                    <ArrowUpRight
+                      className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden="true"
+                    />
                   </a>
-                  <p className="text-[11px] opacity-80">
-                    {social.editorialDescription[language]}
-                  </p>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* Mentions adaptées au statut du projet + bouton retour en haut */}
+        {/* Pied de page bas + bouton retour en haut */}
         <div className="pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-xs theme-muted">
           <div className="space-y-1 max-w-3xl">
             <p className="theme-text opacity-90 font-medium">
+              © {new Date().getFullYear()} MAAHLOX LE VIBEUR —{' '}
               {language === 'fr'
-                ? `${siteConfig.projectStatus.disclaimerFr} — Document de direction artistique soumis à validation.`
-                : `${siteConfig.projectStatus.disclaimerEn} — Art direction proposal subject to validation.`}
+                ? 'La Vibration en Grand · Yaoundé, Cameroun.'
+                : 'The Vibration at Scale · Yaoundé, Cameroon.'}
             </p>
             <p>
               {language === 'fr'
-                ? 'Les œuvres musicales, titres cités et photographies demeurent la propriété exclusive de leurs auteurs, producteurs et ayants droit respectifs. Le wordmark typographique « MAAHLOX » et le slogan « La Vibration en Grand » sont des propositions graphiques du présent concept.'
-                : 'Musical works, cited titles, and photographs remain the exclusive property of their respective authors, producers, and rights holders. The “MAAHLOX” typographic wordmark and “The Vibration at Scale” tagline are graphic proposals of this concept.'}
+                ? 'Les œuvres musicales, titres et photographies demeurent la propriété de leurs auteurs, producteurs et ayants droit respectifs.'
+                : 'Musical works, tracks, and photographs remain the property of their respective authors, producers, and rights holders.'}
             </p>
           </div>
 
@@ -211,10 +170,13 @@ export const Footer: React.FC = () => {
                 ? 'Retourner en haut de la page'
                 : 'Scroll back to top'
             }
-            className="inline-flex items-center gap-2 px-4 py-2.5 border theme-border-strong theme-surface text-xs font-medium uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 self-start sm:self-center shrink-0"
+            className="group inline-flex items-center gap-2 px-4 py-2.5 border theme-border-strong theme-surface text-xs font-medium uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 self-start sm:self-center shrink-0"
           >
             <span>{language === 'fr' ? 'Haut de page' : 'Back to top'}</span>
-            <ArrowUp className="w-4 h-4" aria-hidden="true" />
+            <ArrowUp
+              className="w-4 h-4 transition-transform duration-200 group-hover:-translate-y-0.5"
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>

@@ -1,13 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, Film, Play, X } from 'lucide-react';
 import { VideoClip, videosData } from '../data/videos';
 import { socialsData } from '../data/socials';
 import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export const VideosSection: React.FC = () => {
   const { language } = useAppSettings();
   const [activeClip, setActiveClip] = useState<VideoClip | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const featuredRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const youtubeBannerRef = useRef<HTMLDivElement | null>(null);
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -16,6 +25,86 @@ export const VideosSection: React.FC = () => {
     videosData.find((v) => v.isPrimaryHighlight) || videosData[0];
   const secondaryClips = videosData.filter((v) => v.id !== primaryClip.id);
   const youtubeChannel = socialsData.find((s) => s.platform === 'youtube');
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 28, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 85%',
+            },
+          }
+        );
+      }
+
+      if (featuredRef.current) {
+        gsap.fromTo(
+          featuredRef.current,
+          { y: 36, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.75,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: featuredRef.current,
+              start: 'top 82%',
+            },
+          }
+        );
+      }
+
+      if (gridRef.current) {
+        gsap.fromTo(
+          '.video-secondary-card',
+          { y: 36, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 84%',
+            },
+          }
+        );
+      }
+
+      if (youtubeBannerRef.current) {
+        gsap.fromTo(
+          youtubeBannerRef.current,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: youtubeBannerRef.current,
+              start: 'top 88%',
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const openClipModal = (clip: VideoClip, triggerEl: HTMLButtonElement) => {
     lastTriggerRef.current = triggerEl;
@@ -75,12 +164,16 @@ export const VideosSection: React.FC = () => {
   return (
     <section
       id="videos"
+      ref={sectionRef}
       aria-labelledby="videos-heading"
       className="relative py-20 md:py-32 theme-surface border-b theme-border transition-colors duration-250 font-poppins"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
         {/* En-tête de section */}
-        <div className="flex flex-wrap items-baseline justify-between gap-4 pb-6 mb-12 border-b theme-border">
+        <div
+          ref={headerRef}
+          className="flex flex-wrap items-baseline justify-between gap-4 pb-6 mb-12 border-b theme-border"
+        >
           <div>
             <p className="text-xs md:text-sm font-semibold uppercase tracking-widest theme-accent-text mb-2">
               {language === 'fr'
@@ -96,13 +189,16 @@ export const VideosSection: React.FC = () => {
           </div>
           <p className="text-xs theme-muted font-medium">
             {language === 'fr'
-              ? 'Référence documentée : Playlist « MAAHLOX Le Vibeur – CLIPS OFFICIELS »'
-              : 'Documented reference: Playlist “MAAHLOX Le Vibeur – CLIPS OFFICIELS”'}
+              ? 'Playlist « MAAHLOX Le Vibeur – CLIPS OFFICIELS »'
+              : 'Playlist “MAAHLOX Le Vibeur – CLIPS OFFICIELS”'}
           </p>
         </div>
 
         {/* Mise en avant principale : "Ça sort comme ça sort" */}
-        <div className="mb-12 theme-bg border theme-border overflow-hidden shadow-xl">
+        <div
+          ref={featuredRef}
+          className="group mb-12 theme-bg border theme-border hover:border-[#FF5A1F] overflow-hidden shadow-xl transition-all duration-300"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
             <div className="lg:col-span-8 relative aspect-[16/9] bg-[#080808] overflow-hidden">
               <img
@@ -116,7 +212,7 @@ export const VideosSection: React.FC = () => {
                 referrerPolicy="no-referrer"
                 width={1920}
                 height={1080}
-                className="h-full w-full object-cover object-center opacity-85"
+                className="h-full w-full object-cover object-center opacity-88 group-hover:scale-105 transition-transform duration-500"
               />
               <div
                 aria-hidden="true"
@@ -136,13 +232,11 @@ export const VideosSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={(e) => openClipModal(primaryClip, e.currentTarget)}
-                  className="inline-flex items-center gap-3 px-6 py-3.5 bg-[#FF5A1F] text-[#080808] font-semibold text-xs md:text-sm uppercase tracking-wider hover:bg-[#F5F1E8] transition-colors duration-150 whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-3 px-6 py-3.5 bg-[#FF5A1F] text-[#080808] font-semibold text-xs md:text-sm uppercase tracking-wider hover:bg-[#F5F1E8] hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   <Play className="w-4 h-4 fill-current" aria-hidden="true" />
                   <span>
-                    {language === 'fr'
-                      ? 'Ouvrir la fiche vidéo'
-                      : 'Open video details'}
+                    {language === 'fr' ? 'Regarder le clip' : 'Watch video'}
                   </span>
                 </button>
               </div>
@@ -168,27 +262,22 @@ export const VideosSection: React.FC = () => {
                   href={primaryClip.externalSearchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-between px-4 py-3 border theme-border-strong text-xs font-semibold uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150"
+                  className="w-full inline-flex items-center justify-between px-4 py-3 border theme-border-strong text-xs font-semibold uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200"
                 >
                   <span>
                     {language === 'fr'
-                      ? 'Voir sur YouTube (externe)'
-                      : 'Watch on YouTube (external)'}
+                      ? 'Voir sur YouTube'
+                      : 'Watch on YouTube'}
                   </span>
                   <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
                 </a>
-                <p className="text-[11px] theme-muted">
-                  {language === 'fr'
-                    ? 'Chargement différé : aucun lecteur externe n’est exécuté sans action de votre part.'
-                    : 'Deferred loading: no external player is loaded without your interaction.'}
-                </p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Sélection secondaire (4 titres) */}
-        <div className="mb-12">
+        <div ref={gridRef} className="mb-12">
           <h3 className="text-xs font-semibold uppercase tracking-widest theme-muted mb-6">
             {language === 'fr'
               ? 'Sélection complémentaire du répertoire vidéo'
@@ -201,7 +290,7 @@ export const VideosSection: React.FC = () => {
               return (
                 <article
                   key={clip.id}
-                  className="group theme-bg border theme-border hover:border-[#FF5A1F] transition-all duration-250 md:hover:-translate-y-1 flex flex-col justify-between"
+                  className="video-secondary-card group theme-bg border theme-border hover:border-[#FF5A1F] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_16px_36px_rgba(255,90,31,0.14)] flex flex-col justify-between"
                 >
                   <div>
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#171717]">
@@ -216,7 +305,7 @@ export const VideosSection: React.FC = () => {
                         referrerPolicy="no-referrer"
                         width={800}
                         height={500}
-                        className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       />
                       <div
                         aria-hidden="true"
@@ -228,7 +317,7 @@ export const VideosSection: React.FC = () => {
                     </div>
 
                     <div className="p-5">
-                      <h4 className="font-display text-2xl theme-text tracking-wide mb-1">
+                      <h4 className="font-display text-2xl theme-text group-hover:text-[#FF5A1F] transition-colors duration-200 tracking-wide mb-1">
                         {clip.title}
                       </h4>
                       {collab && (
@@ -255,7 +344,7 @@ export const VideosSection: React.FC = () => {
                         aria-hidden="true"
                       />
                       <span>
-                        {language === 'fr' ? 'Accéder au clip' : 'Open clip'}
+                        {language === 'fr' ? 'Regarder' : 'Watch'}
                       </span>
                     </button>
 
@@ -264,7 +353,7 @@ export const VideosSection: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`YouTube — ${clip.title}`}
-                      className="inline-flex items-center gap-1 text-xs font-medium theme-muted hover:theme-text transition-colors duration-150 whitespace-nowrap shrink-0"
+                      className="inline-flex items-center gap-1 text-xs font-medium theme-muted hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
                     >
                       <span>YouTube</span>
                       <ArrowUpRight
@@ -279,21 +368,24 @@ export const VideosSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 3 : Carte YouTube associée aux clips */}
+        {/* Carte YouTube associée aux clips */}
         {youtubeChannel && youtubeChannel.url && (
-          <div className="p-6 md:p-8 theme-bg border theme-border flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div
+            ref={youtubeBannerRef}
+            className="group p-6 md:p-8 theme-bg border theme-border hover:border-[#FF5A1F] transition-all duration-300 hover:-translate-y-1 flex flex-col md:flex-row md:items-center justify-between gap-6"
+          >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 theme-surface border theme-border-strong flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 theme-surface border border-[#FF5A1F]/40 bg-[#FF5A1F]/10 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
                 <SocialBrandLogo
                   platform="youtube"
-                  className="w-6 h-6 theme-accent-text"
+                  className="w-6 h-6 text-[#FF5A1F]"
                 />
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-widest theme-accent-text">
                   {language === 'fr'
-                    ? 'Chaîne YouTube associée aux clips'
-                    : 'YouTube channel associated with music videos'}
+                    ? 'Chaîne YouTube officielle des clips'
+                    : 'Official Music Videos YouTube Channel'}
                 </p>
                 <h3 className="font-display text-2xl md:text-3xl theme-text tracking-wide">
                   {youtubeChannel.label[language]}
@@ -311,7 +403,7 @@ export const VideosSection: React.FC = () => {
               aria-label={`${youtubeChannel.label[language]} (${
                 language === 'fr' ? 'ouverture externe' : 'opens in new tab'
               })`}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 theme-accent-bg font-poppins font-semibold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity duration-150 whitespace-nowrap shrink-0 self-start md:self-center"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 theme-accent-bg font-poppins font-semibold text-xs uppercase tracking-wider hover:opacity-95 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0 self-start md:self-center"
             >
               <span>
                 {language === 'fr'
@@ -388,13 +480,13 @@ export const VideosSection: React.FC = () => {
                   <div className="space-y-2">
                     <h4 className="text-base font-semibold theme-text">
                       {language === 'fr'
-                        ? 'Intégration directe en attente de l’identifiant vidéo exact'
-                        : 'Direct embed awaiting exact video ID'}
+                        ? `Visionner « ${activeClip.title} » sur YouTube`
+                        : `Watch “${activeClip.title}” on YouTube`}
                     </h4>
                     <p className="text-sm theme-muted leading-relaxed">
                       {language === 'fr'
-                        ? `Conformément aux règles de fiabilité du projet, aucun identifiant YouTube n’est inventé et aucun faux lecteur n’est simulé. Vous pouvez ouvrir directement la recherche officielle du clip « ${activeClip.title} » ou la chaîne YouTube associée via les liens ci-dessous.`
-                        : `In accordance with project reliability guidelines, no YouTube IDs are invented and no fake video player is simulated. You can open the official search for “${activeClip.title}” or the associated YouTube channel below.`}
+                        ? `Accédez directement au clip « ${activeClip.title} » et à la playlist complète sur la chaîne YouTube MAAHLOX officiel.`
+                        : `Watch “${activeClip.title}” and the full music video playlist directly on the MAAHLOX officiel YouTube channel.`}
                     </p>
                   </div>
                 </div>

@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react';
 import { GalleryCategory, galleryData, GalleryMediaItem } from '../data/gallery';
 import { useAppSettings } from '../context/AppSettingsContext';
+
+gsap.registerPlugin(ScrollTrigger);
 
 type FilterOption = 'all' | GalleryCategory;
 
@@ -9,6 +13,9 @@ export const GallerySection: React.FC = () => {
   const { language } = useAppSettings();
   const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const lightboxRef = useRef<HTMLDivElement | null>(null);
@@ -50,6 +57,52 @@ export const GallerySection: React.FC = () => {
     activeFilter === 'all'
       ? galleryData
       : galleryData.filter((item) => item.category === activeFilter);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 28, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 85%',
+            },
+          }
+        );
+      }
+
+      if (gridRef.current) {
+        gsap.fromTo(
+          '.gallery-card-item',
+          { y: 36, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 82%',
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [activeFilter]);
 
   const openLightbox = (index: number, triggerEl: HTMLButtonElement) => {
     lastTriggerRef.current = triggerEl;
@@ -127,12 +180,16 @@ export const GallerySection: React.FC = () => {
   return (
     <section
       id="galerie"
+      ref={sectionRef}
       aria-labelledby="galerie-heading"
       className="relative py-20 md:py-32 theme-bg border-b theme-border transition-colors duration-250 font-poppins"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
         {/* En-tête de section + filtres fonctionnels */}
-        <div className="flex flex-wrap items-end justify-between gap-6 pb-6 mb-12 border-b theme-border">
+        <div
+          ref={headerRef}
+          className="flex flex-wrap items-end justify-between gap-6 pb-6 mb-12 border-b theme-border"
+        >
           <div>
             <p className="text-xs md:text-sm font-semibold uppercase tracking-widest theme-accent-text mb-2">
               {language === 'fr'
@@ -147,7 +204,6 @@ export const GallerySection: React.FC = () => {
             </h2>
           </div>
 
-          {/* Barre de filtres interactifs */}
           <div
             role="group"
             aria-label={
@@ -168,7 +224,7 @@ export const GallerySection: React.FC = () => {
                     setLightboxIndex(null);
                   }}
                   aria-pressed={isSelected}
-                  className={`px-3.5 py-2 text-xs font-medium transition-colors duration-150 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-xs font-medium transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap shrink-0 ${
                     isSelected
                       ? 'theme-accent-bg font-semibold'
                       : 'theme-muted hover:theme-text'
@@ -183,11 +239,14 @@ export const GallerySection: React.FC = () => {
         </div>
 
         {/* Grille éditoriale asymétrique */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
+        >
           {filteredItems.map((item, idx) => (
             <figure
               key={item.id}
-              className={`${item.gridSpanClass} group theme-surface border theme-border overflow-hidden`}
+              className={`gallery-card-item ${item.gridSpanClass} group theme-surface border theme-border hover:border-[#FF5A1F] hover:-translate-y-1.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.3)] transition-all duration-300 overflow-hidden`}
             >
               <button
                 type="button"
@@ -209,7 +268,7 @@ export const GallerySection: React.FC = () => {
                     height={item.height}
                     loading="lazy"
                     referrerPolicy="no-referrer"
-                    className="h-full w-full object-cover object-center group-hover:scale-103 transition-transform duration-300"
+                    className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                   />
                   <div
                     aria-hidden="true"
@@ -224,7 +283,7 @@ export const GallerySection: React.FC = () => {
 
               <figcaption className="p-4 border-t theme-border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                 <div>
-                  <span className="font-semibold theme-text">
+                  <span className="font-semibold theme-text group-hover:text-[#FF5A1F] transition-colors duration-200">
                     {language === 'fr' ? item.titleFr : item.titleEn}
                   </span>
                   <span className="mx-2 theme-accent-text" aria-hidden="true">
@@ -259,7 +318,6 @@ export const GallerySection: React.FC = () => {
           className="fixed inset-0 z-[90] bg-[#080808]/95 text-[#F5F1E8] backdrop-blur-sm flex flex-col justify-between p-4 md:p-8 font-poppins"
           onClick={closeLightbox}
         >
-          {/* Barre supérieure */}
           <div
             className="flex items-center justify-between border-b border-[#F5F1E8]/15 pb-4"
             onClick={(e) => e.stopPropagation()}
@@ -296,7 +354,6 @@ export const GallerySection: React.FC = () => {
             </button>
           </div>
 
-          {/* Zone centrale d'image */}
           <div
             className="relative my-auto py-4 flex items-center justify-center max-h-[70vh]"
             onClick={(e) => e.stopPropagation()}
@@ -345,7 +402,6 @@ export const GallerySection: React.FC = () => {
             )}
           </div>
 
-          {/* Légende et crédits en bas de Lightbox */}
           <div
             className="border-t border-[#F5F1E8]/15 pt-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
             onClick={(e) => e.stopPropagation()}

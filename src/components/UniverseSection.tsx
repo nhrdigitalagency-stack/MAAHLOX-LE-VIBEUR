@@ -36,18 +36,34 @@ export const UniverseSection: React.FC = () => {
         }
       );
 
+      gsap.fromTo(
+        '.universe-fade-item',
+        { y: 24, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: textBlockRef.current,
+            start: 'top 80%',
+          },
+        }
+      );
+
       if (imageWrapRef.current) {
         gsap.fromTo(
           imageWrapRef.current,
-          { y: 24 },
+          { y: 28, opacity: 0 },
           {
-            y: -24,
-            ease: 'none',
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
             scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
+              trigger: imageWrapRef.current,
+              start: 'top 84%',
             },
           }
         );
@@ -82,28 +98,28 @@ export const UniverseSection: React.FC = () => {
 
         {/* Grille éditoriale asymétrique */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          {/* Grands mots typographiques (Proposition créative du site) */}
+          {/* Grands mots typographiques */}
           <div ref={textBlockRef} className="lg:col-span-7 space-y-8">
             <div className="space-y-2">
               <p className="font-poppins text-xs font-medium theme-muted uppercase tracking-wider mb-3">
                 {language === 'fr'
-                  ? 'Direction artistique · Proposition éditoriale du site'
-                  : 'Art Direction · Editorial site proposal'}
+                  ? 'Direction artistique & Identité sonore'
+                  : 'Art Direction & Sonic Identity'}
               </p>
               <div className="font-display text-[clamp(2.75rem,6.8vw,6rem)] leading-[0.92] tracking-tight theme-text [text-wrap:balance]">
-                <span className="universe-word-reveal block">
+                <span className="universe-word-reveal block hover:translate-x-2 transition-transform duration-300">
                   {language === 'fr' ? 'UNE VOIX.' : 'ONE VOICE.'}
                 </span>
-                <span className="universe-word-reveal block theme-accent-text">
+                <span className="universe-word-reveal block theme-accent-text hover:translate-x-2 transition-transform duration-300">
                   {language === 'fr' ? 'UNE ÉNERGIE.' : 'ONE ENERGY.'}
                 </span>
-                <span className="universe-word-reveal block">
+                <span className="universe-word-reveal block hover:translate-x-2 transition-transform duration-300">
                   {language === 'fr' ? 'UNE VIBRATION.' : 'ONE VIBRATION.'}
                 </span>
               </div>
             </div>
 
-            <div className="pt-4 border-t theme-border max-w-2xl space-y-5 font-poppins">
+            <div className="universe-fade-item pt-4 border-t theme-border max-w-2xl space-y-5 font-poppins">
               <p className="text-lg md:text-xl theme-text font-medium leading-relaxed">
                 {language === 'fr' ? artistData.shortBioFr : artistData.shortBioEn}
               </p>
@@ -114,9 +130,9 @@ export const UniverseSection: React.FC = () => {
               </p>
             </div>
 
-            {/* Repères d'identité sous forme de liste éditoriale sans pilules en Poppins */}
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t theme-border font-poppins">
-              <div>
+            {/* Repères d'identité avec animations au survol */}
+            <dl className="universe-fade-item grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t theme-border font-poppins">
+              <div className="p-4 theme-surface border theme-border hover:border-[#FF5A1F] hover:-translate-y-1 transition-all duration-250">
                 <dt className="text-xs font-medium uppercase tracking-wider theme-muted">
                   {language === 'fr'
                     ? 'Nom de scène & identité civile'
@@ -126,7 +142,7 @@ export const UniverseSection: React.FC = () => {
                   {artistData.stageName} · {artistData.civilName}
                 </dd>
               </div>
-              <div>
+              <div className="p-4 theme-surface border theme-border hover:border-[#FF5A1F] hover:-translate-y-1 transition-all duration-250">
                 <dt className="text-xs font-medium uppercase tracking-wider theme-muted">
                   {language === 'fr'
                     ? 'Naissance & ancrage'
@@ -138,11 +154,11 @@ export const UniverseSection: React.FC = () => {
                     : `${artistData.birthDateFormattedEn} · ${artistData.anchorageEn}`}
                 </dd>
               </div>
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 p-4 theme-surface border theme-border hover:border-[#FF5A1F] hover:-translate-y-1 transition-all duration-250">
                 <dt className="text-xs font-medium uppercase tracking-wider theme-muted">
                   {language === 'fr'
-                    ? 'Registre musical documenté'
-                    : 'Documented musical register'}
+                    ? 'Registre musical'
+                    : 'Musical register'}
                 </dt>
                 <dd className="mt-1 text-sm md:text-base theme-text opacity-90">
                   {(language === 'fr'
@@ -154,10 +170,10 @@ export const UniverseSection: React.FC = () => {
             </dl>
           </div>
 
-          {/* Image verticale autorisée à droite avec déplacement différentiel léger */}
+          {/* Image verticale autorisée à droite avec animation au survol */}
           <div className="lg:col-span-5">
             <div ref={imageWrapRef}>
-              <figure className="theme-surface border theme-border overflow-hidden">
+              <figure className="group theme-surface border theme-border hover:border-[#FF5A1F] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#171717]">
                   {!imgError ? (
                     <img
@@ -172,7 +188,7 @@ export const UniverseSection: React.FC = () => {
                       width={900}
                       height={1200}
                       onError={() => setImgError(true)}
-                      className="h-full w-full object-cover object-center"
+                      className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center p-6 text-center">
@@ -187,7 +203,7 @@ export const UniverseSection: React.FC = () => {
                   />
                 </div>
                 <figcaption className="p-4 border-t theme-border flex items-center justify-between gap-4 font-poppins text-xs theme-muted">
-                  <span>
+                  <span className="group-hover:theme-text transition-colors duration-200">
                     {language === 'fr'
                       ? 'Portrait studio · Esthétique frontale'
                       : 'Studio portrait · Direct aesthetic'}

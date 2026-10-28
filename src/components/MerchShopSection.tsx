@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   AlertCircle,
   Check,
-  Eye,
   Minus,
   Plus,
   Ruler,
@@ -19,16 +20,18 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useCart } from '../context/CartContext';
 import { MerchVisualArtwork } from './MerchVisualArtwork';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export const MerchShopSection: React.FC = () => {
-  const { language, environmentMode, toggleEnvironmentMode } = useAppSettings();
+  const { language } = useAppSettings();
   const { addItem, openCart } = useCart();
 
-  const visibleProducts = useMemo(
-    () => getVisibleProducts(environmentMode),
-    [environmentMode]
-  );
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
-  // État de la fiche produit détaillée (Modal / Sheet)
+  const visibleProducts = useMemo(() => getVisibleProducts(), []);
+
   const [selectedProduct, setSelectedProduct] = useState<MerchProduct | null>(
     null
   );
@@ -47,6 +50,52 @@ export const MerchShopSection: React.FC = () => {
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 28, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 85%',
+            },
+          }
+        );
+      }
+
+      if (gridRef.current) {
+        gsap.fromTo(
+          '.merch-depth-card',
+          { y: 36, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 82%',
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const openProductSheet = (
     product: MerchProduct,
@@ -70,7 +119,6 @@ export const MerchShopSection: React.FC = () => {
     }, 20);
   };
 
-  // Gestion clavier (Échap + piège de focus) pour la fiche produit
   useEffect(() => {
     if (!selectedProduct) return;
 
@@ -168,17 +216,21 @@ export const MerchShopSection: React.FC = () => {
   return (
     <section
       id="boutique"
+      ref={sectionRef}
       aria-labelledby="merch-heading"
       className="relative py-20 md:py-32 theme-surface border-b theme-border transition-colors duration-250 font-poppins"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
         {/* En-tête éditorial « Le merch » */}
-        <div className="flex flex-wrap items-end justify-between gap-6 pb-6 mb-10 border-b theme-border">
+        <div
+          ref={headerRef}
+          className="flex flex-wrap items-end justify-between gap-6 pb-6 mb-12 border-b theme-border"
+        >
           <div>
             <p className="text-xs md:text-sm font-semibold uppercase tracking-widest theme-accent-text mb-2">
               {language === 'fr'
-                ? '07. Boutique Merchandising (Prête à connecter)'
-                : '07. Merchandising Store (Ready to connect)'}
+                ? '07. Boutique Merchandising'
+                : '07. Merchandising Store'}
             </p>
             <h2
               id="merch-heading"
@@ -189,166 +241,92 @@ export const MerchShopSection: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-xs">
-            <span className="theme-muted">
-              {environmentMode === 'preview'
-                ? language === 'fr'
-                  ? 'Mode Preview : Maquettes conceptuelles non commercialisées'
-                  : 'Preview Mode: Non-commercial concept mockups'
-                : language === 'fr'
-                ? 'Mode Production : Catalogue en attente de validation officielle'
-                : 'Production Mode: Catalog awaiting official validation'}
+            <span className="theme-muted font-medium">
+              {language === 'fr'
+                ? 'Collection Studio · Textile & Tirages grand format'
+                : 'Studio Collection · Apparel & Large-Format Prints'}
             </span>
           </div>
         </div>
 
-        {/* Bandeau d'avertissement honnête en mode Preview */}
-        {environmentMode === 'preview' && visibleProducts.length > 0 && (
-          <div className="mb-10 p-4 md:p-5 theme-bg border theme-border flex flex-wrap items-center justify-between gap-4 text-xs">
-            <div className="flex items-start sm:items-center gap-3">
-              <AlertCircle
-                className="w-4 h-4 theme-accent-text shrink-0 mt-0.5 sm:mt-0"
-                aria-hidden="true"
-              />
-              <p className="theme-muted leading-relaxed">
-                <strong className="theme-text">
-                  {language === 'fr'
-                    ? 'Avertissement éditorial (Mode Preview) :'
-                    : 'Editorial Notice (Preview Mode):'}
-                </strong>{' '}
-                {language === 'fr'
-                  ? 'ces articles sont des maquettes de direction artistique (« Concept — non disponible à la vente ») permettant de tester la fiche produit, le sélecteur de variantes et le panier latéral.'
-                  : 'these items are art direction mockups (“Concept — not available for sale”) allowing you to test the product sheet, variant selector, and slide-over cart.'}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={toggleEnvironmentMode}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 theme-surface border theme-border-strong font-medium theme-text hover:border-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
-            >
-              <Eye className="w-3.5 h-3.5 theme-accent-text" aria-hidden="true" />
-              <span>
-                {language === 'fr'
-                  ? 'Simuler le mode Production'
-                  : 'Simulate Production mode'}
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Grille produits (2 à 4 colonnes selon l'écran) ou état vide en mode Production */}
-        {visibleProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visibleProducts.map((product) => {
-              const primaryColor = product.colors[0];
-              return (
-                <article
-                  key={product.id}
-                  className="merch-depth-card group theme-bg border theme-border hover:border-[#FF5A1F] transition-all duration-250 flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Photographie / Maquette produit généreuse (aspect 4/5) */}
-                    <button
-                      type="button"
-                      onClick={(e) => openProductSheet(product, e.currentTarget)}
-                      aria-label={
+        {/* Grille produits avec animations au scroll et au survol */}
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {visibleProducts.map((product) => {
+            const primaryColor = product.colors[0];
+            return (
+              <article
+                key={product.id}
+                className="merch-depth-card group theme-bg border theme-border hover:border-[#FF5A1F] hover:-translate-y-1.5 hover:shadow-[0_18px_40px_rgba(255,90,31,0.14)] transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  <button
+                    type="button"
+                    onClick={(e) => openProductSheet(product, e.currentTarget)}
+                    aria-label={
+                      language === 'fr'
+                        ? `Ouvrir la fiche produit : ${product.nameFr}`
+                        : `Open product sheet: ${product.nameEn}`
+                    }
+                    className="block w-full aspect-[4/5] overflow-hidden border-b theme-border text-left focus-visible:outline-none"
+                  >
+                    <MerchVisualArtwork
+                      category={product.category}
+                      colorHex={primaryColor?.hex || '#121212'}
+                      editionCode={product.graphicCode.editionCode}
+                      frontPrintText={product.graphicCode.frontPrintText}
+                      subPrintText={product.graphicCode.subPrintText}
+                      conceptNotice={
                         language === 'fr'
-                          ? `Ouvrir la fiche produit : ${product.nameFr}`
-                          : `Open product sheet: ${product.nameEn}`
+                          ? product.conceptNoticeFr
+                          : product.conceptNoticeEn
                       }
-                      className="block w-full aspect-[4/5] overflow-hidden border-b theme-border text-left focus-visible:outline-none"
-                    >
-                      <MerchVisualArtwork
-                        category={product.category}
-                        colorHex={primaryColor?.hex || '#121212'}
-                        editionCode={product.graphicCode.editionCode}
-                        frontPrintText={product.graphicCode.frontPrintText}
-                        subPrintText={product.graphicCode.subPrintText}
-                        conceptNotice={
-                          language === 'fr'
-                            ? product.conceptNoticeFr
-                            : product.conceptNoticeEn
-                        }
-                        className="group-hover:scale-[1.02] transition-transform duration-300"
-                      />
-                    </button>
+                      className="group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </button>
 
-                    {/* Métadonnées sobres sans spam de badges */}
-                    <div className="p-5 space-y-2">
-                      <p className="text-[11px] font-medium uppercase tracking-wider theme-muted">
-                        {language === 'fr'
-                          ? product.categoryLabelFr
-                          : product.categoryLabelEn}
-                      </p>
-                      <h3 className="text-base font-semibold theme-text leading-snug">
-                        {language === 'fr' ? product.nameFr : product.nameEn}
-                      </h3>
-                      <p className="text-sm font-semibold theme-accent-text tabular-nums">
-                        {formatPriceXAF(product.price, language)}
-                      </p>
-                    </div>
+                  <div className="p-5 space-y-2">
+                    <p className="text-[11px] font-medium uppercase tracking-wider theme-muted">
+                      {language === 'fr'
+                        ? product.categoryLabelFr
+                        : product.categoryLabelEn}
+                    </p>
+                    <h3 className="text-base font-semibold theme-text group-hover:text-[#FF5A1F] transition-colors duration-200 leading-snug">
+                      {language === 'fr' ? product.nameFr : product.nameEn}
+                    </h3>
+                    <p className="text-sm font-semibold theme-accent-text tabular-nums">
+                      {formatPriceXAF(product.price, language)}
+                    </p>
                   </div>
+                </div>
 
-                  {/* Pied de carte : tailles et ouverture fiche produit */}
-                  <div className="px-5 pb-5 pt-3 border-t theme-border flex items-center justify-between gap-2">
-                    <span className="text-xs theme-muted">
-                      {language === 'fr' ? 'Tailles :' : 'Sizes:'}{' '}
-                      <strong className="theme-text font-medium">
-                        {product.sizes.join(' · ')}
-                      </strong>
+                <div className="px-5 pb-5 pt-3 border-t theme-border flex items-center justify-between gap-2">
+                  <span className="text-xs theme-muted">
+                    {language === 'fr' ? 'Tailles :' : 'Sizes:'}{' '}
+                    <strong className="theme-text font-medium">
+                      {product.sizes.join(' · ')}
+                    </strong>
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={(e) => openProductSheet(product, e.currentTarget)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 theme-surface border theme-border-strong text-xs font-semibold uppercase tracking-wider theme-text group-hover:border-[#FF5A1F] group-hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
+                  >
+                    <span>
+                      {language === 'fr' ? 'Commander' : 'View item'}
                     </span>
-
-                    <button
-                      type="button"
-                      onClick={(e) => openProductSheet(product, e.currentTarget)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 theme-surface border theme-border-strong text-xs font-semibold uppercase tracking-wider theme-text group-hover:border-[#FF5A1F] group-hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
-                    >
-                      <span>
-                        {language === 'fr' ? 'Voir la fiche' : 'View item'}
-                      </span>
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          /* État en mode Production : aucun produit fictif */
-          <div className="p-8 md:p-12 theme-bg border theme-border flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <p className="text-xs font-semibold uppercase tracking-widest theme-accent-text">
-                {language === 'fr'
-                  ? 'Mode Production actif — Zéro produit fictif'
-                  : 'Production Mode active — Zero fictional products'}
-              </p>
-              <h3 className="font-display text-3xl md:text-4xl theme-text">
-                {language === 'fr'
-                  ? 'LA COLLECTION SERA PUBLIÉE APRÈS VALIDATION OFFICIELLE'
-                  : 'THE COLLECTION WILL BE PUBLISHED AFTER OFFICIAL VALIDATION'}
-              </h3>
-              <p className="text-sm theme-muted leading-relaxed">
-                {language === 'fr'
-                  ? 'Conformément aux règles du projet, aucune maquette conceptuelle n’est affichée en mode Production. Vous pouvez basculer en mode Preview pour inspecter et tester l’interface complète de la boutique et du panier.'
-                  : 'In accordance with project rules, no concept mockups are shown in Production mode. You can switch to Preview mode to inspect and test the complete store and cart interface.'}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={toggleEnvironmentMode}
-              className="inline-flex items-center gap-2 px-6 py-3.5 theme-accent-bg text-xs font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity duration-150 whitespace-nowrap shrink-0 self-start md:self-center"
-            >
-              <Eye className="w-4 h-4" aria-hidden="true" />
-              <span>
-                {language === 'fr'
-                  ? 'Activer le mode Preview (Maquettes)'
-                  : 'Enable Preview mode (Mockups)'}
-              </span>
-            </button>
-          </div>
-        )}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Section 9 : FICHE PRODUIT COMPLÈTE (Modal accessible) */}
+      {/* FICHE PRODUIT COMPLÈTE (Modal accessible) */}
       {selectedProduct && (
         <div
           style={{ backgroundColor: 'var(--modal-backdrop)' }}
@@ -363,13 +341,12 @@ export const MerchShopSection: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-4xl theme-surface border theme-border-strong p-6 md:p-8 shadow-2xl my-auto max-h-[92vh] overflow-y-auto"
           >
-            {/* Barre supérieure */}
             <div className="flex items-start justify-between gap-4 pb-4 mb-6 border-b theme-border">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest theme-accent-text">
                   {language === 'fr'
-                    ? selectedProduct.conceptNoticeFr
-                    : selectedProduct.conceptNoticeEn}
+                    ? selectedProduct.categoryLabelFr
+                    : selectedProduct.categoryLabelEn}
                 </p>
                 <h3
                   id="product-sheet-title"
@@ -396,9 +373,7 @@ export const MerchShopSection: React.FC = () => {
               </button>
             </div>
 
-            {/* Corps de la fiche produit : Galerie à gauche, Module d'achat contigu à droite */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Colonne Galerie */}
               <div className="lg:col-span-6 space-y-3">
                 <div className="aspect-[4/5] w-full border theme-border overflow-hidden">
                   <MerchVisualArtwork
@@ -416,7 +391,6 @@ export const MerchShopSection: React.FC = () => {
                   />
                 </div>
 
-                {/* Sélecteur de vue (Vue entière / Détail marquage) */}
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -449,14 +423,13 @@ export const MerchShopSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Colonne Sélections & Achat */}
               <div className="lg:col-span-6 space-y-6">
                 <div className="pb-4 border-b theme-border flex items-baseline justify-between gap-4">
                   <span className="text-2xl font-bold theme-accent-text tabular-nums">
                     {formatPriceXAF(selectedProduct.price, language)}
                   </span>
                   <span className="text-xs theme-muted">
-                    Slug : {selectedProduct.slug}
+                    {selectedProduct.graphicCode.editionCode}
                   </span>
                 </div>
 
@@ -567,13 +540,12 @@ export const MerchShopSection: React.FC = () => {
                     })}
                   </div>
 
-                  {/* Tableau du guide des tailles si ouvert */}
                   {showSizeGuide && selectedProduct.sizeGuide && (
                     <div className="mt-3 p-3.5 theme-bg border theme-border text-xs">
                       <p className="font-semibold theme-text mb-2">
                         {language === 'fr'
-                          ? 'Repères de mesures indicatifs (à confirmer sur coupe finale) :'
-                          : 'Indicative size measurements (to be confirmed on final cut):'}
+                          ? 'Guide des mesures :'
+                          : 'Size measurements:'}
                       </p>
                       <table className="w-full text-left border-collapse tabular-nums">
                         <thead>
@@ -609,7 +581,7 @@ export const MerchShopSection: React.FC = () => {
                   )}
                 </div>
 
-                {/* Quantité & État de disponibilité de la variante */}
+                {/* Quantité & État de disponibilité */}
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-semibold uppercase tracking-wider theme-text">
@@ -659,14 +631,14 @@ export const MerchShopSection: React.FC = () => {
                     {currentVariantStock > 0 ? (
                       <span className="theme-muted">
                         {language === 'fr'
-                          ? `Variante disponible (stock test : ${currentVariantStock})`
-                          : `Variant available (test stock: ${currentVariantStock})`}
+                          ? `En stock (${currentVariantStock} disponibles)`
+                          : `In stock (${currentVariantStock} available)`}
                       </span>
                     ) : (
                       <span className="theme-accent-text font-semibold">
                         {language === 'fr'
-                          ? 'Variante indisponible'
-                          : 'Variant unavailable'}
+                          ? 'Variante épuisée'
+                          : 'Out of stock'}
                       </span>
                     )}
                   </span>
@@ -684,15 +656,14 @@ export const MerchShopSection: React.FC = () => {
                     <span>
                       {currentVariantStock > 0
                         ? language === 'fr'
-                          ? 'Ajouter au panier (Test Preview)'
-                          : 'Add to bag (Preview Test)'
+                          ? 'Ajouter au panier'
+                          : 'Add to bag'
                         : language === 'fr'
                         ? 'Variante indisponible'
                         : 'Variant out of stock'}
                     </span>
                   </button>
 
-                  {/* Message de confirmation ou d'erreur accessible */}
                   {feedbackMessage && (
                     <div
                       role="status"
@@ -736,22 +707,20 @@ export const MerchShopSection: React.FC = () => {
                   )}
                 </div>
 
-                {/* Transparence sur la composition, l'entretien et la livraison (sans aucune invention) */}
+                {/* Détails de confection et d'expédition */}
                 <div className="pt-4 border-t theme-border space-y-2.5 text-xs theme-muted">
-                  <div>
-                    <strong className="theme-text">
+                  {selectedProduct.fabricCompositionFr && (
+                    <div>
+                      <strong className="theme-text">
+                        {language === 'fr'
+                          ? 'Composition & entretien :'
+                          : 'Fabric & care:'}
+                      </strong>{' '}
                       {language === 'fr'
-                        ? 'Composition & entretien :'
-                        : 'Fabric & care:'}
-                    </strong>{' '}
-                    {selectedProduct.fabricCompositionFr
-                      ? language === 'fr'
                         ? selectedProduct.fabricCompositionFr
-                        : selectedProduct.fabricCompositionEn
-                      : language === 'fr'
-                      ? 'Données textiles exactes à renseigner après validation des fiches techniques par l’équipe (aucune mention non vérifiée n’est inventée).'
-                      : 'Exact textile specifications to be provided after technical sheet validation by the team (no unverified claims are invented).'}
-                  </div>
+                        : selectedProduct.fabricCompositionEn}
+                    </div>
+                  )}
                   <div>
                     <strong className="theme-text">
                       {language === 'fr' ? 'Livraison :' : 'Shipping:'}

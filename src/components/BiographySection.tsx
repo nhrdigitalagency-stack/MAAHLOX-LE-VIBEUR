@@ -354,7 +354,7 @@ export const BiographySection: React.FC = () => {
                     chapterRefs.current[chapter.id] = el;
                   }}
                   data-chapter-id={chapter.id}
-                  className={`bio-chapter-card p-6 md:p-8 theme-bg border transition-colors duration-200 ${
+                  className={`bio-chapter-card group p-6 md:p-8 theme-bg border transition-all duration-300 hover:-translate-y-1 hover:border-[#FF5A1F] hover:shadow-[0_16px_36px_rgba(0,0,0,0.25)] ${
                     isCurrent ? 'border-[#FF5A1F]' : 'theme-border'
                   }`}
                 >
@@ -366,12 +366,12 @@ export const BiographySection: React.FC = () => {
                     </span>
                     <span className="text-xs theme-muted">
                       {language === 'fr'
-                        ? 'Repère vérifié'
-                        : 'Verified milestone'}
+                        ? 'Repère chronologique'
+                        : 'Timeline milestone'}
                     </span>
                   </div>
 
-                  <h3 className="font-display text-3xl md:text-4xl theme-text tracking-wide mb-2">
+                  <h3 className="font-display text-3xl md:text-4xl theme-text group-hover:text-[#FF5A1F] transition-colors duration-200 tracking-wide mb-2">
                     {chapter.number}. {chapter.title[language]}
                   </h3>
                   <p className="text-sm font-medium theme-muted mb-5">
@@ -391,7 +391,7 @@ export const BiographySection: React.FC = () => {
                       referrerPolicy="no-referrer"
                       width={800}
                       height={600}
-                      className="w-full aspect-[16/10] object-cover object-center"
+                      className="w-full aspect-[16/10] object-cover object-center transition-transform duration-500 group-hover:scale-105"
                     />
                     <figcaption className="px-3 py-2 text-xs theme-muted border-t theme-border">
                       {language === 'fr'

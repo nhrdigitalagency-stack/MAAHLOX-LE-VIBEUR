@@ -15,14 +15,7 @@ import { LanguageToggle } from './LanguageToggle';
 import { SocialBrandLogo } from './SocialBrandLogo';
 
 export const Header: React.FC = () => {
-  const {
-    language,
-    theme,
-    toggleTheme,
-    featureFlags,
-    environmentMode,
-    toggleEnvironmentMode,
-  } = useAppSettings();
+  const { language, theme, toggleTheme, featureFlags } = useAppSettings();
   const { totalQuantity, openCart } = useCart();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +26,6 @@ export const Header: React.FC = () => {
   const firstMenuLinkRef = useRef<HTMLAnchorElement | null>(null);
   const mobileDialogRef = useRef<HTMLDivElement | null>(null);
 
-  // Filtrer les éléments de navigation selon les feature flags actifs
   const enabledNavItems = useMemo(() => {
     return siteConfig.navigation.filter((item) => {
       if (!item.featureFlag) return true;
@@ -53,7 +45,6 @@ export const Header: React.FC = () => {
 
   const activeSocials = useMemo(() => getActivePublicSocials(), []);
 
-  // Détection du défilement pour compacter subtilement la capsule sans saut de mise en page
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 36);
@@ -63,7 +54,6 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Suivi de la section active pour l'indicateur capsule interne (250–350 ms)
   useEffect(() => {
     const sectionIds = enabledNavItems.map((item) => item.id);
     const elements = sectionIds
@@ -91,7 +81,6 @@ export const Header: React.FC = () => {
     return () => observer.disconnect();
   }, [enabledNavItems]);
 
-  // Accessibilité du menu mobile : verrouillage du scroll, focus trap, touche Échap
   useEffect(() => {
     if (!isMobileMenuOpen) return;
 
@@ -147,7 +136,6 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      {/* Lien d'évitement clavier */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-[#FF5A1F] focus:text-[#080808] focus:px-4 focus:py-2.5 focus:rounded-full focus:font-poppins focus:font-semibold focus:text-sm"
@@ -157,17 +145,15 @@ export const Header: React.FC = () => {
           : 'Skip to main content'}
       </a>
 
-      {/* Section 4 : HEADER BUBBLE PREMIUM (Capsule flottante centrée adaptative Dark/Light) */}
       <header className="fixed top-4 md:top-5 inset-x-0 z-50 px-3 sm:px-6 pointer-events-none flex justify-center">
         <div
           style={{ backgroundColor: 'var(--header-scrim)' }}
-          className={`pointer-events-auto w-full max-w-[1220px] rounded-full theme-text border theme-border-strong shadow-[0_12px_36px_rgba(0,0,0,0.42)] backdrop-blur-md flex items-center justify-between gap-2 lg:gap-4 transition-all duration-300 ease-out ${
+          className={`pointer-events-auto w-full max-w-[1220px] rounded-full theme-text border theme-border-strong shadow-[0_12px_36px_rgba(0,0,0,0.42)] backdrop-blur-md flex items-center justify-between gap-2 lg:gap-4 transition-all duration-300 ease-out hover:border-[#FF5A1F]/40 ${
             isScrolled
               ? 'px-3.5 py-1.5 md:px-5 md:py-2 scale-[0.985]'
               : 'px-4 py-2 md:px-6 md:py-2.5 scale-100'
           }`}
         >
-          {/* Zone 1 : Wordmark MAAHLOX à gauche */}
           <a
             href="#top"
             aria-label={
@@ -175,12 +161,11 @@ export const Header: React.FC = () => {
                 ? 'MAAHLOX — Retour en haut de page'
                 : 'MAAHLOX — Back to top'
             }
-            className="font-display text-xl sm:text-2xl tracking-wider theme-text hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0 pl-1"
+            className="font-display text-xl sm:text-2xl tracking-wider theme-text hover:text-[#FF5A1F] hover:scale-105 transition-all duration-200 whitespace-nowrap shrink-0 pl-1"
           >
             MAAHLOX
           </a>
 
-          {/* Zone 2 : Navigation desktop avec capsule interne active (passage en mode compact sous xl) */}
           <nav
             aria-label={
               language === 'fr' ? 'Navigation principale' : 'Primary navigation'
@@ -195,10 +180,10 @@ export const Header: React.FC = () => {
                   href={item.href}
                   onClick={() => setActiveSectionId(item.id)}
                   aria-current={isActive ? 'location' : undefined}
-                  className={`relative px-3 py-1.5 rounded-full transition-all duration-300 whitespace-nowrap shrink-0 ${
+                  className={`relative px-3.5 py-1.5 rounded-full transition-all duration-250 whitespace-nowrap shrink-0 ${
                     isActive
-                      ? 'theme-accent-bg font-semibold shadow-xs'
-                      : 'theme-text opacity-80 hover:opacity-100 hover:bg-[#FF5A1F]/10'
+                      ? 'theme-accent-bg font-semibold shadow-xs scale-[1.02]'
+                      : 'theme-text opacity-80 hover:opacity-100 hover:text-[#FF5A1F] hover:bg-[#FF5A1F]/10 hover:-translate-y-0.5'
                   }`}
                 >
                   {item.label[language]}
@@ -207,12 +192,9 @@ export const Header: React.FC = () => {
             })}
           </nav>
 
-          {/* Zone 3 : Bascule FR/EN + Bascule Thème Clair/Sombre + Booking + Panier + Menu compact */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Sélecteur de langue FR / EN intégré dans le Header Bubble */}
             <LanguageToggle variant="bubble" />
 
-            {/* Bouton de bascule de thème Sombre / Clair intégré dans le Header Bubble */}
             <button
               type="button"
               onClick={toggleTheme}
@@ -234,12 +216,12 @@ export const Header: React.FC = () => {
                   ? 'Passer au thème sombre'
                   : 'Switch to dark mode'
               }
-              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full theme-surface border theme-border-strong theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 font-poppins text-xs font-semibold min-h-[36px] shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full theme-surface border theme-border-strong theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 font-poppins text-xs font-semibold min-h-[36px] shrink-0"
             >
               {theme === 'dark' ? (
                 <>
                   <Sun
-                    className="w-3.5 h-3.5 theme-accent-text shrink-0"
+                    className="w-3.5 h-3.5 theme-accent-text shrink-0 transition-transform duration-300 hover:rotate-45"
                     aria-hidden="true"
                   />
                   <span className="hidden md:inline text-[11px]">
@@ -249,7 +231,7 @@ export const Header: React.FC = () => {
               ) : (
                 <>
                   <Moon
-                    className="w-3.5 h-3.5 theme-accent-text shrink-0"
+                    className="w-3.5 h-3.5 theme-accent-text shrink-0 transition-transform duration-300 hover:-rotate-12"
                     aria-hidden="true"
                   />
                   <span className="hidden md:inline text-[11px]">
@@ -263,7 +245,7 @@ export const Header: React.FC = () => {
               <a
                 href={bookingNav.href}
                 onClick={() => setActiveSectionId(bookingNav.id)}
-                className="hidden md:inline-flex items-center justify-center px-3.5 py-2 rounded-full font-poppins text-xs font-semibold uppercase tracking-wider theme-accent-bg hover:opacity-90 transition-opacity duration-150 whitespace-nowrap shrink-0 min-h-[36px]"
+                className="hidden md:inline-flex items-center justify-center px-4 py-2 rounded-full font-poppins text-xs font-semibold uppercase tracking-wider theme-accent-bg hover:opacity-95 hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(255,90,31,0.35)] transition-all duration-200 whitespace-nowrap shrink-0 min-h-[36px]"
               >
                 {bookingNav.label[language]}
               </a>
@@ -282,7 +264,7 @@ export const Header: React.FC = () => {
                         totalQuantity !== 1 ? 's' : ''
                       })`
                 }
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full theme-surface border theme-border-strong theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 font-poppins text-xs font-semibold whitespace-nowrap shrink-0 min-h-[36px]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full theme-surface border theme-border-strong theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 font-poppins text-xs font-semibold whitespace-nowrap shrink-0 min-h-[36px]"
               >
                 <ShoppingBag
                   className="w-3.5 h-3.5 theme-accent-text"
@@ -308,7 +290,7 @@ export const Header: React.FC = () => {
                   ? 'Ouvrir le menu de navigation'
                   : 'Open navigation menu'
               }
-              className="xl:hidden inline-flex items-center justify-center w-9 h-9 rounded-full theme-text border theme-border-strong theme-surface hover:border-[#FF5A1F] transition-colors duration-150 shrink-0"
+              className="xl:hidden inline-flex items-center justify-center w-9 h-9 rounded-full theme-text border theme-border-strong theme-surface hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 shrink-0"
             >
               <Menu className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -316,7 +298,6 @@ export const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Menu overlay accessible sur mobile / tablette (< xl) */}
       {isMobileMenuOpen && (
         <div
           id="mobile-fullscreen-menu"
@@ -326,7 +307,6 @@ export const Header: React.FC = () => {
           aria-label={language === 'fr' ? 'Menu principal' : 'Main menu'}
           className="fixed inset-0 z-[70] theme-bg flex flex-col justify-between p-6 overflow-y-auto xl:hidden animate-fadeIn"
         >
-          {/* En-tête du menu overlay */}
           <div className="flex items-center justify-between border-b theme-border pb-4">
             <span className="font-display text-2xl tracking-wider theme-text">
               MAAHLOX
@@ -365,7 +345,6 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Liens principaux avec entrée décalée légère */}
           <nav
             aria-label={
               language === 'fr' ? 'Navigation mobile' : 'Mobile navigation'
@@ -386,7 +365,7 @@ export const Header: React.FC = () => {
                       setActiveSectionId(item.id);
                       closeMobileMenuAndRestoreFocus();
                     }}
-                    className="flex items-baseline justify-between font-display text-3xl sm:text-4xl tracking-wide theme-text hover:text-[#FF5A1F] transition-colors duration-150"
+                    className="flex items-baseline justify-between font-display text-3xl sm:text-4xl tracking-wide theme-text hover:text-[#FF5A1F] hover:translate-x-2 transition-all duration-200"
                   >
                     <span>{item.label[language]}</span>
                     <span className="font-poppins text-xs font-medium theme-muted tabular-nums">
@@ -397,13 +376,12 @@ export const Header: React.FC = () => {
               ))}
             </ul>
 
-            {/* Section 3 : Liens réseaux sociaux documentés dans le menu mobile */}
             {activeSocials.length > 0 && (
               <div className="mt-6 pt-5 border-t theme-border">
                 <p className="font-poppins text-xs font-semibold uppercase tracking-wider theme-muted mb-3">
                   {language === 'fr'
-                    ? 'Réseaux & Chaînes documentés'
-                    : 'Documented Channels & Socials'}
+                    ? 'Réseaux & Chaînes'
+                    : 'Channels & Socials'}
                 </p>
                 <div className="flex flex-wrap items-center gap-2.5">
                   {activeSocials.map((social) => (
@@ -415,7 +393,7 @@ export const Header: React.FC = () => {
                       aria-label={`${social.label[language]} (${
                         language === 'fr' ? 'nouvel onglet' : 'opens in new tab'
                       })`}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 theme-surface border theme-border-strong font-poppins text-xs font-medium theme-text hover:border-[#FF5A1F] transition-colors duration-150"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 theme-surface border theme-border-strong font-poppins text-xs font-medium theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150"
                     >
                       <SocialBrandLogo
                         platform={social.platform}
@@ -432,7 +410,6 @@ export const Header: React.FC = () => {
               </div>
             )}
 
-            {/* Contrôles Langue, Thème et Mode Preview/Production */}
             <div className="mt-6 pt-5 border-t theme-border flex flex-wrap items-center gap-2.5">
               <LanguageToggle variant="toolbar" />
 
@@ -457,36 +434,17 @@ export const Header: React.FC = () => {
                   </>
                 )}
               </button>
-
-              <button
-                type="button"
-                onClick={toggleEnvironmentMode}
-                className="inline-flex items-center gap-2 px-3.5 py-2 border theme-border-strong theme-surface font-poppins text-xs font-semibold uppercase tracking-wider theme-text hover:border-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
-              >
-                <span>
-                  {environmentMode === 'preview'
-                    ? language === 'fr'
-                      ? 'Mode : Preview (Maquettes)'
-                      : 'Mode: Preview (Mockups)'
-                    : language === 'fr'
-                    ? 'Mode : Production'
-                    : 'Mode: Production'}
-                </span>
-              </button>
             </div>
           </nav>
 
-          {/* Pied de menu mobile */}
           <div className="border-t theme-border pt-4 flex flex-wrap items-center justify-between gap-2 font-poppins text-xs theme-muted">
             <span>
               {language === 'fr'
-                ? 'Artiste camerounais · Yaoundé'
-                : 'Cameroonian artist · Yaoundé'}
+                ? 'Artiste camerounais · Yaoundé / Obili'
+                : 'Cameroonian artist · Yaoundé / Obili'}
             </span>
-            <span>
-              {language === 'fr'
-                ? siteConfig.projectStatus.disclaimerFr
-                : siteConfig.projectStatus.disclaimerEn}
+            <span className="theme-accent-text font-semibold">
+              MAAHLOX LE VIBEUR
             </span>
           </div>
         </div>

@@ -241,7 +241,7 @@ export const MerchVisualArtwork: React.FC<MerchVisualArtworkProps> = ({
       {/* Pied de vignette */}
       <div className="relative z-10 flex items-center justify-between text-[10px] font-poppins text-[#A8A29A] border-t border-[#F5F1E8]/12 pt-2">
         <span>{subPrintText}</span>
-        <span className="uppercase tracking-wider">MAQUETTE STUDIO</span>
+        <span className="uppercase tracking-wider">COLLECTION STUDIO</span>
       </div>
     </div>
   );

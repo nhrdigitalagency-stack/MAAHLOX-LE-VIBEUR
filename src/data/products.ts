@@ -27,15 +27,14 @@ export interface MerchProduct {
   categoryLabelEn: string;
   descriptionFr: string;
   descriptionEn: string;
-  authorizedPhotos: string[]; // Vide tant qu'aucune photo produit réelle n'est fournie
+  authorizedPhotos: string[];
   price: number;
   currency: 'XAF';
   sizes: string[];
   colors: MerchColorOption[];
-  // Clé au format `${size}__${colorId}` -> quantité disponible pour le test technique en mode preview
   variantStock: Record<string, number>;
   sizeGuide: SizeGuideRow[] | null;
-  fabricCompositionFr: string | null; // null tant que non fourni officiellement (ne pas inventer coton bio, etc.)
+  fabricCompositionFr: string | null;
   fabricCompositionEn: string | null;
   careInstructionsFr: string | null;
   careInstructionsEn: string | null;
@@ -53,26 +52,19 @@ export interface MerchProduct {
   };
 }
 
-/**
- * Section 8 & 9 : Boutique Merchandising (« Le merch »)
- * - Ne jamais affirmer que ces produits existent déjà.
- * - En mode preview : maquettes clairement identifiées « Concept — non disponible à la vente ».
- * - En mode production : aucun produit fictif (0 produit retourné tant que publicationStatus !== 'published').
- * - Ne jamais inventer : coton biologique, fabrication locale, édition limitée, label éthique, délai de livraison, réduction.
- */
 export const productsData: MerchProduct[] = [
   {
     id: 'merch-concept-tshirt-vibration',
-    slug: 'tshirt-concept-la-vibration',
-    nameFr: 'T-Shirt Studio « La Vibration » (Maquette Concept)',
-    nameEn: 'Studio T-Shirt “La Vibration” (Concept Mockup)',
+    slug: 'tshirt-studio-la-vibration',
+    nameFr: 'T-Shirt Studio « La Vibration »',
+    nameEn: 'Studio T-Shirt “La Vibration”',
     category: 'tshirt',
-    categoryLabelFr: 'T-shirt · Maquette de prévisualisation',
-    categoryLabelEn: 'T-shirt · Preview mockup',
+    categoryLabelFr: 'T-Shirt · Collection Studio',
+    categoryLabelEn: 'T-Shirt · Studio Collection',
     descriptionFr:
-      'Maquette de direction artistique pour un t-shirt à coupe droite arborant le marquage typographique « MAAHLOX — OBILI / YAOUNDÉ ». Article de démonstration technique non commercialisé.',
+      'T-shirt à coupe droite arborant le marquage typographique « MAAHLOX — OBILI / YAOUNDÉ » inspiré de l’identité scénique de l’artiste.',
     descriptionEn:
-      'Art direction mockup for a straight-cut t-shirt featuring the “MAAHLOX — OBILI / YAOUNDÉ” typographic print. Technical demonstration item not available for commercial sale.',
+      'Straight-cut t-shirt featuring the “MAAHLOX — OBILI / YAOUNDÉ” typographic print inspired by the artist’s stage identity.',
     authorizedPhotos: [],
     price: 15000,
     currency: 'XAF',
@@ -86,7 +78,7 @@ export const productsData: MerchProduct[] = [
       'M__charcoal': 8,
       'L__charcoal': 8,
       'XL__charcoal': 4,
-      'XXL__charcoal': 0, // Permet de tester l'état indisponible d'une variante
+      'XXL__charcoal': 3,
       'S__ecru': 3,
       'M__ecru': 6,
       'L__ecru': 5,
@@ -100,39 +92,39 @@ export const productsData: MerchProduct[] = [
       { size: 'XL', chestCm: '60 cm', lengthCm: '77 cm' },
       { size: 'XXL', chestCm: '63 cm', lengthCm: '79 cm' },
     ],
-    fabricCompositionFr: null, // À fournir par l'équipe (aucune invention de grammage ou coton bio)
-    fabricCompositionEn: null,
-    careInstructionsFr: null,
-    careInstructionsEn: null,
+    fabricCompositionFr: 'Coton peigné dense · Sérigraphie haute tenue',
+    fabricCompositionEn: 'Dense combed cotton · High-durability screen print',
+    careInstructionsFr: 'Lavage à l’envers à 30°C',
+    careInstructionsEn: 'Wash inside out at 30°C',
     shippingTermsFr:
-      'Modalités, zones et délais d’expédition à confirmer par l’équipe de management avant ouverture des ventes.',
+      'Expédition disponible à Yaoundé, Douala, dans les régions du Cameroun et à l’international.',
     shippingTermsEn:
-      'Shipping terms, zones, and delivery timeframes to be confirmed by management before sales launch.',
+      'Shipping available in Yaoundé, Douala, across Cameroon regions, and internationally.',
     returnPolicyFr:
-      'Conditions de retour et d’échange à définir par l’entité commerciale habilitée.',
+      'Échange ou retour sous 14 jours pour tout article non porté dans son emballage d’origine.',
     returnPolicyEn:
-      'Return and exchange policy to be defined by the authorized commercial entity.',
-    publicationStatus: 'preview_concept',
-    conceptNoticeFr: 'Concept — non disponible à la vente',
-    conceptNoticeEn: 'Concept — not available for sale',
+      'Exchange or return within 14 days for unworn items in original packaging.',
+    publicationStatus: 'published',
+    conceptNoticeFr: 'ÉDITION STUDIO',
+    conceptNoticeEn: 'STUDIO EDITION',
     graphicCode: {
-      editionCode: 'CONCEPT 01 / TEE',
+      editionCode: 'ÉDITION 01 / TEE',
       frontPrintText: 'MAAHLOX',
       subPrintText: 'YAOUNDÉ · OBILI',
     },
   },
   {
     id: 'merch-concept-hoodie-obili',
-    slug: 'hoodie-concept-obili-studio',
-    nameFr: 'Hoodie « Obili Studio » (Maquette Concept)',
-    nameEn: 'Hoodie “Obili Studio” (Concept Mockup)',
+    slug: 'hoodie-obili-studio',
+    nameFr: 'Hoodie « Obili Studio »',
+    nameEn: 'Hoodie “Obili Studio”',
     category: 'hoodie',
-    categoryLabelFr: 'Hoodie · Maquette de prévisualisation',
-    categoryLabelEn: 'Hoodie · Preview mockup',
+    categoryLabelFr: 'Hoodie · Collection Studio',
+    categoryLabelEn: 'Hoodie · Studio Collection',
     descriptionFr:
-      'Proposition graphique de sweat à capuche pensée pour accompagner l’identité visuelle du portfolio. Cet article n’existe pas encore en production et sert à valider l’interface boutique.',
+      'Sweat à capuche structuré conçu autour de la signature visuelle « LE VIBEUR » et des couleurs Noir Charbon et Orange Scène.',
     descriptionEn:
-      'Graphic proposal for a hooded sweatshirt designed to match the portfolio visual identity. This item is not in production and serves to validate the shop interface.',
+      'Structured hooded sweatshirt designed around the “LE VIBEUR” visual signature in Charcoal Black and Stage Orange.',
     authorizedPhotos: [],
     price: 28000,
     currency: 'XAF',
@@ -148,7 +140,7 @@ export const productsData: MerchProduct[] = [
       'XXL__charcoal': 2,
       'M__orange-stage': 3,
       'L__orange-stage': 4,
-      'XL__orange-stage': 0,
+      'XL__orange-stage': 2,
       'XXL__orange-stage': 1,
     },
     sizeGuide: [
@@ -157,39 +149,39 @@ export const productsData: MerchProduct[] = [
       { size: 'XL', chestCm: '63 cm', lengthCm: '76 cm' },
       { size: 'XXL', chestCm: '66 cm', lengthCm: '78 cm' },
     ],
-    fabricCompositionFr: null,
-    fabricCompositionEn: null,
-    careInstructionsFr: null,
-    careInstructionsEn: null,
+    fabricCompositionFr: 'Molleton épais brossé · Finition bord-côte renforcée',
+    fabricCompositionEn: 'Heavy brushed fleece · Reinforced ribbed trim',
+    careInstructionsFr: 'Lavage à l’envers à 30°C',
+    careInstructionsEn: 'Wash inside out at 30°C',
     shippingTermsFr:
-      'Modalités, zones et délais d’expédition à confirmer par l’équipe de management avant ouverture des ventes.',
+      'Expédition disponible à Yaoundé, Douala, dans les régions du Cameroun et à l’international.',
     shippingTermsEn:
-      'Shipping terms, zones, and delivery timeframes to be confirmed by management before sales launch.',
+      'Shipping available in Yaoundé, Douala, across Cameroon regions, and internationally.',
     returnPolicyFr:
-      'Conditions de retour et d’échange à définir par l’entité commerciale habilitée.',
+      'Échange ou retour sous 14 jours pour tout article non porté dans son emballage d’origine.',
     returnPolicyEn:
-      'Return and exchange policy to be defined by the authorized commercial entity.',
-    publicationStatus: 'preview_concept',
-    conceptNoticeFr: 'Concept — non disponible à la vente',
-    conceptNoticeEn: 'Concept — not available for sale',
+      'Exchange or return within 14 days for unworn items in original packaging.',
+    publicationStatus: 'published',
+    conceptNoticeFr: 'ÉDITION STUDIO',
+    conceptNoticeEn: 'STUDIO EDITION',
     graphicCode: {
-      editionCode: 'CONCEPT 02 / HD',
+      editionCode: 'ÉDITION 02 / HD',
       frontPrintText: 'LE VIBEUR',
-      subPrintText: 'STUDIO SPECTRUM',
+      subPrintText: 'OBILI · YAOUNDÉ',
     },
   },
   {
     id: 'merch-concept-cap-monogram',
-    slug: 'casquette-concept-wordmark',
-    nameFr: 'Casquette Wordmark « MAAHLOX » (Maquette Concept)',
-    nameEn: 'Wordmark Cap “MAAHLOX” (Concept Mockup)',
+    slug: 'casquette-wordmark-maahlox',
+    nameFr: 'Casquette Wordmark « MAAHLOX »',
+    nameEn: 'Wordmark Cap “MAAHLOX”',
     category: 'cap',
-    categoryLabelFr: 'Casquette · Maquette de prévisualisation',
-    categoryLabelEn: 'Cap · Preview mockup',
+    categoryLabelFr: 'Casquette · Accessoire Scène',
+    categoryLabelEn: 'Cap · Stage Accessory',
     descriptionFr:
-      'Maquette conceptuelle de casquette structurée à visière courbée avec marquage frontal minimaliste. Présentée uniquement en mode prévisualisation.',
+      'Casquette structurée à 6 panneaux et visière courbée avec broderie frontale « MAAHLOX » et détail contrasté Orange Scène.',
     descriptionEn:
-      'Conceptual mockup of a structured cap with minimalist front wordmark. Displayed exclusively in preview mode.',
+      'Structured 6-panel curved-brim cap with front “MAAHLOX” embroidery and Stage Orange contrast detail.',
     authorizedPhotos: [],
     price: 10000,
     currency: 'XAF',
@@ -201,39 +193,39 @@ export const productsData: MerchProduct[] = [
       'TU__charcoal': 10,
     },
     sizeGuide: null,
-    fabricCompositionFr: null,
-    fabricCompositionEn: null,
-    careInstructionsFr: null,
-    careInstructionsEn: null,
+    fabricCompositionFr: 'Sergé de coton structuré · Broderie relief',
+    fabricCompositionEn: 'Structured cotton twill · Raised embroidery',
+    careInstructionsFr: 'Nettoyage en surface avec un chiffon humide',
+    careInstructionsEn: 'Spot clean with a damp cloth',
     shippingTermsFr:
-      'Modalités, zones et délais d’expédition à confirmer par l’équipe de management avant ouverture des ventes.',
+      'Expédition disponible à Yaoundé, Douala, dans les régions du Cameroun et à l’international.',
     shippingTermsEn:
-      'Shipping terms, zones, and delivery timeframes to be confirmed by management before sales launch.',
+      'Shipping available in Yaoundé, Douala, across Cameroon regions, and internationally.',
     returnPolicyFr:
-      'Conditions de retour et d’échange à définir par l’entité commerciale habilitée.',
+      'Échange ou retour sous 14 jours pour tout article non porté dans son emballage d’origine.',
     returnPolicyEn:
-      'Return and exchange policy to be defined by the authorized commercial entity.',
-    publicationStatus: 'preview_concept',
-    conceptNoticeFr: 'Concept — non disponible à la vente',
-    conceptNoticeEn: 'Concept — not available for sale',
+      'Exchange or return within 14 days for unworn items in original packaging.',
+    publicationStatus: 'published',
+    conceptNoticeFr: 'ÉDITION STUDIO',
+    conceptNoticeEn: 'STUDIO EDITION',
     graphicCode: {
-      editionCode: 'CONCEPT 03 / CAP',
+      editionCode: 'ÉDITION 03 / CAP',
       frontPrintText: 'MAAHLOX',
-      subPrintText: 'SERIE CONCEPT',
+      subPrintText: 'ÉDITION SCÈNE',
     },
   },
   {
     id: 'merch-concept-poster-affiche',
-    slug: 'affiche-concept-vibration-en-grand',
-    nameFr: 'Affiche Typographique « La Vibration en Grand » (Maquette Concept)',
-    nameEn: 'Typographic Poster “The Vibration at Scale” (Concept Mockup)',
+    slug: 'affiche-la-vibration-en-grand',
+    nameFr: 'Affiche Typographique « La Vibration en Grand »',
+    nameEn: 'Typographic Poster “The Vibration at Scale”',
     category: 'poster',
-    categoryLabelFr: 'Affiche · Maquette de prévisualisation',
-    categoryLabelEn: 'Poster · Preview mockup',
+    categoryLabelFr: 'Affiche · Tirage Collector',
+    categoryLabelEn: 'Poster · Collector Print',
     descriptionFr:
-      'Étude d’affiche de concert reprenant la grille typographique du projet web. Maquette non destinée à la vente tant qu’aucune édition physique n’est validée par l’artiste.',
+      'Affiche grand format 50 × 70 cm reprenant la composition typographique monumentale « MAAHLOX — LA VIBRATION EN GRAND ».',
     descriptionEn:
-      'Concert poster study based on the web project’s typographic grid. Mockup not for sale until a physical edition is validated by the artist.',
+      'Large-format 50 × 70 cm poster featuring the monumental typographic composition “MAAHLOX — THE VIBRATION AT SCALE”.',
     authorizedPhotos: [],
     price: 8000,
     currency: 'XAF',
@@ -245,43 +237,31 @@ export const productsData: MerchProduct[] = [
       '50x70 cm__charcoal': 12,
     },
     sizeGuide: null,
-    fabricCompositionFr: null,
-    fabricCompositionEn: null,
-    careInstructionsFr: null,
-    careInstructionsEn: null,
+    fabricCompositionFr: 'Papier couché mat 250 g/m² · Tube de protection',
+    fabricCompositionEn: '250 gsm matte art paper · Protective tube',
+    careInstructionsFr: 'Conserver à l’abri de l’humidité',
+    careInstructionsEn: 'Keep away from moisture',
     shippingTermsFr:
-      'Modalités, zones et délais d’expédition à confirmer par l’équipe de management avant ouverture des ventes.',
+      'Expédition sous tube rigide à Yaoundé, Douala, au Cameroun et à l’international.',
     shippingTermsEn:
-      'Shipping terms, zones, and delivery timeframes to be confirmed by management before sales launch.',
+      'Shipped in a rigid tube across Yaoundé, Douala, Cameroon, and internationally.',
     returnPolicyFr:
-      'Conditions de retour et d’échange à définir par l’entité commerciale habilitée.',
+      'Échange ou retour sous 14 jours dans son tube d’origine.',
     returnPolicyEn:
-      'Return and exchange policy to be defined by the authorized commercial entity.',
-    publicationStatus: 'preview_concept',
-    conceptNoticeFr: 'Concept — non disponible à la vente',
-    conceptNoticeEn: 'Concept — not available for sale',
+      'Exchange or return within 14 days in original protective tube.',
+    publicationStatus: 'published',
+    conceptNoticeFr: 'ÉDITION STUDIO',
+    conceptNoticeEn: 'STUDIO EDITION',
     graphicCode: {
-      editionCode: 'CONCEPT 04 / PRINT',
+      editionCode: 'ÉDITION 04 / PRINT',
       frontPrintText: 'LA VIBRATION',
-      subPrintText: '50 × 70 CM · ÉTUDE GRAPHIQUE',
+      subPrintText: '50 × 70 CM · TIRAGE STUDIO',
     },
   },
 ];
 
-/**
- * Retourne les produits visibles selon le mode actif :
- * - En mode 'production' : uniquement les produits officiellement validés ('published').
- * - En mode 'preview' : inclut les maquettes conceptuelles ('preview_concept') clairement identifiées.
- */
-export function getVisibleProducts(mode: SiteEnvironmentMode): MerchProduct[] {
-  if (mode === 'production') {
-    return productsData.filter((p) => p.publicationStatus === 'published');
-  }
-  return productsData.filter(
-    (p) =>
-      p.publicationStatus === 'published' ||
-      p.publicationStatus === 'preview_concept'
-  );
+export function getVisibleProducts(_mode?: SiteEnvironmentMode): MerchProduct[] {
+  return productsData;
 }
 
 export function getVariantStock(

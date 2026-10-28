@@ -7,13 +7,11 @@ import {
   Disc,
   Info,
   Search,
-  VolumeX,
   X,
 } from 'lucide-react';
 import {
   ChronologyEraGroup,
   documentedChronologyData,
-  optionalAudioConfig,
   ReleaseProject,
   releasesData,
 } from '../data/releases';
@@ -35,6 +33,7 @@ export const DiscographySection: React.FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const cardsGridRef = useRef<HTMLDivElement | null>(null);
+  const chronologyContainerRef = useRef<HTMLDivElement | null>(null);
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
   const modalCloseBtnRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -57,7 +56,10 @@ export const DiscographySection: React.FC = () => {
       )
       .map((block) => {
         const filteredTracks = block.tracks.filter((track) => {
-          if (onlyConfirmedSpotify && track.spotifyAction !== 'listen_confirmed') {
+          if (
+            onlyConfirmedSpotify &&
+            track.spotifyAction !== 'listen_confirmed'
+          ) {
             return false;
           }
           if (!q) return true;
@@ -123,6 +125,26 @@ export const DiscographySection: React.FC = () => {
           }
         );
       }
+
+      const eraBlocks = gsap.utils.toArray<HTMLElement>(
+        '.chronology-era-block'
+      );
+      eraBlocks.forEach((blockEl) => {
+        gsap.fromTo(
+          blockEl,
+          { y: 32, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: blockEl,
+              start: 'top 86%',
+            },
+          }
+        );
+      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -242,8 +264,8 @@ export const DiscographySection: React.FC = () => {
               className="font-display text-4xl md:text-6xl theme-text tracking-tight"
             >
               {language === 'fr'
-                ? 'PROJETS & TOUS LES SONS DOCUMENTÉS'
-                : 'PROJECTS & ALL DOCUMENTED TRACKS'}
+                ? 'PROJETS & TOUS LES SONS'
+                : 'PROJECTS & ALL TRACKS'}
             </h2>
           </div>
 
@@ -252,7 +274,7 @@ export const DiscographySection: React.FC = () => {
               href="https://open.spotify.com/search/Maahlox%20Le%20Vibeur"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-5 py-3 theme-accent-bg font-poppins font-semibold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity duration-150 whitespace-nowrap shrink-0"
+              className="group inline-flex items-center gap-2.5 px-5 py-3 theme-accent-bg font-poppins font-semibold text-xs uppercase tracking-wider hover:opacity-95 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(255,90,31,0.35)] transition-all duration-200 whitespace-nowrap shrink-0"
             >
               <SocialBrandLogo platform="spotify" className="w-4 h-4" />
               <span>
@@ -260,18 +282,24 @@ export const DiscographySection: React.FC = () => {
                   ? 'Profil Spotify : Maahlox Le Vibeur'
                   : 'Spotify Profile: Maahlox Le Vibeur'}
               </span>
-              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              <ArrowUpRight
+                className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
             </a>
 
             <a
               href="https://www.deezer.com/fr/search/Maahlox%20Le%20Vibeur"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-3 theme-surface border theme-border-strong font-poppins font-semibold text-xs uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
+              className="group inline-flex items-center gap-2 px-4 py-3 theme-surface border theme-border-strong font-poppins font-semibold text-xs uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
             >
               <SocialBrandLogo platform="deezer" className="w-4 h-4" />
               <span>Deezer</span>
-              <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+              <ArrowUpRight
+                className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
             </a>
           </div>
         </div>
@@ -284,10 +312,9 @@ export const DiscographySection: React.FC = () => {
           {releasesData.map((project) => (
             <article
               key={project.id}
-              className="release-project-card group theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-200 flex flex-col justify-between"
+              className="release-project-card group theme-surface border theme-border hover:border-[#FF5A1F] hover:-translate-y-1.5 hover:shadow-[0_18px_40px_rgba(255,90,31,0.14)] transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                {/* Composition typographique temporaire */}
                 <div className="relative aspect-square w-full bg-[#080808] text-[#F5F1E8] border-b theme-border p-6 flex flex-col justify-between overflow-hidden">
                   <div className="flex items-center justify-between text-xs font-medium text-[#A8A29A]">
                     <span>{project.typographicPosterCode.indexNumber}</span>
@@ -300,11 +327,11 @@ export const DiscographySection: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="my-auto py-4">
+                  <div className="my-auto py-4 transition-transform duration-300 group-hover:translate-x-1">
                     <p className="text-[11px] font-medium uppercase tracking-widest text-[#A8A29A] mb-2">
                       MAAHLOX LE VIBEUR
                     </p>
-                    <h3 className="font-display text-3xl md:text-4xl text-[#F5F1E8] leading-[0.95] tracking-wide group-hover:text-[#FF5A1F] transition-colors duration-150 [text-wrap:balance]">
+                    <h3 className="font-display text-3xl md:text-4xl text-[#F5F1E8] leading-[0.95] tracking-wide group-hover:text-[#FF5A1F] transition-colors duration-200 [text-wrap:balance]">
                       {project.title}
                     </h3>
                   </div>
@@ -312,14 +339,13 @@ export const DiscographySection: React.FC = () => {
                   <div className="pt-3 border-t border-[#F5F1E8]/12 flex items-center justify-between text-[11px] text-[#A8A29A]">
                     <span>
                       {language === 'fr'
-                        ? `${project.documentedTracksFr.length} pistes documentées`
-                        : `${project.documentedTracksEn.length} documented tracks`}
+                        ? `${project.documentedTracksFr.length} pistes`
+                        : `${project.documentedTracksEn.length} tracks`}
                     </span>
                     <span>{project.typographicPosterCode.shortCode}</span>
                   </div>
                 </div>
 
-                {/* Corps de carte */}
                 <div className="p-6">
                   <p className="text-xs font-semibold theme-accent-text mb-2">
                     {language === 'fr'
@@ -334,7 +360,6 @@ export const DiscographySection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Actions de carte */}
               <div className="px-6 pb-6 pt-3 border-t theme-border flex items-center justify-between gap-3">
                 <button
                   type="button"
@@ -376,49 +401,31 @@ export const DiscographySection: React.FC = () => {
         </div>
 
         {/* CATALOGUE CHRONOLOGIQUE COMPLET (11 PÉRIODES · 2012 – 2026) */}
-        <div className="pt-10 border-t theme-border space-y-8">
+        <div
+          ref={chronologyContainerRef}
+          className="pt-10 border-t theme-border space-y-8"
+        >
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-widest theme-accent-text">
                 {language === 'fr'
-                  ? 'Répertoire chronologique vérifié (Qobuz, Spotify, Stillac, Audiomack, Shazam, Soundcharts)'
-                  : 'Verified chronological repertoire (Qobuz, Spotify, Stillac, Audiomack, Shazam, Soundcharts)'}
+                  ? 'Répertoire chronologique complet (2012 – 2026)'
+                  : 'Complete chronological repertoire (2012 – 2026)'}
               </p>
               <h3 className="font-display text-3xl md:text-5xl theme-text tracking-tight">
                 {language === 'fr'
-                  ? `CHRONOLOGIE DES SORTIES (${totalDocumentedTracksCount} MORCEAUX RECENSÉS)`
-                  : `RELEASE CHRONOLOGY (${totalDocumentedTracksCount} INDEXED TRACKS)`}
+                  ? `CHRONOLOGIE DES SORTIES (${totalDocumentedTracksCount} MORCEAUX)`
+                  : `RELEASE CHRONOLOGY (${totalDocumentedTracksCount} TRACKS)`}
               </h3>
               <p className="text-sm theme-muted leading-relaxed">
                 {language === 'fr'
-                  ? 'Distinction stricte entre les pistes dont la présence directe sur Spotify est confirmée (« Écouter ») et les autres titres documentés (« Rechercher » — sans garantie de disponibilité sur la plateforme).'
-                  : 'Strict distinction between tracks with confirmed direct availability on Spotify (“Listen”) and other documented tracks (“Search” — availability on the platform not guaranteed).'}
+                  ? 'Accédez à chaque titre sur Spotify (« Écouter » pour les pistes directement liées, ou « Rechercher » sur la plateforme).'
+                  : 'Access each track on Spotify (“Listen” for directly linked tracks, or “Search” on the platform).'}
               </p>
             </div>
-
-            {!optionalAudioConfig.isEnabled && (
-              <div className="p-4 theme-surface border theme-border text-xs theme-muted max-w-md space-y-1">
-                <div className="flex items-center gap-2 theme-text font-semibold">
-                  <VolumeX
-                    className="w-4 h-4 theme-accent-text shrink-0"
-                    aria-hidden="true"
-                  />
-                  <span>
-                    {language === 'fr'
-                      ? 'Écoute externe via Spotify / Deezer'
-                      : 'External listening via Spotify / Deezer'}
-                  </span>
-                </div>
-                <p className="leading-relaxed">
-                  {language === 'fr'
-                    ? 'Aucun lecteur audio interne simulé n’est affiché tant que les extraits maîtres autorisés ne sont pas fournis.'
-                    : 'No simulated built-in audio player is shown until authorized master audio excerpts are provided.'}
-                </p>
-              </div>
-            )}
           </div>
 
-          {/* Barre de filtres par période + Recherche instantanée + Filtre pistes Spotify confirmées */}
+          {/* Barre de filtres par période + Recherche instantanée */}
           <div className="p-5 theme-surface border theme-border space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               {eraFilterButtons.map((btn) => {
@@ -429,7 +436,7 @@ export const DiscographySection: React.FC = () => {
                     type="button"
                     onClick={() => setSelectedEraGroup(btn.id)}
                     aria-pressed={active}
-                    className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border transition-colors duration-150 ${
+                    className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border transition-all duration-200 hover:-translate-y-0.5 ${
                       active
                         ? 'theme-accent-bg border-[#FF5A1F]'
                         : 'theme-bg theme-text theme-border hover:border-[#FF5A1F]'
@@ -474,8 +481,8 @@ export const DiscographySection: React.FC = () => {
                 />
                 <span>
                   {language === 'fr'
-                    ? 'Afficher uniquement les pistes Spotify directement confirmées (« Écouter »)'
-                    : 'Show only directly confirmed Spotify tracks (“Listen”)'}
+                    ? 'Afficher uniquement les pistes Spotify directes (« Écouter »)'
+                    : 'Show only direct Spotify tracks (“Listen”)'}
                 </span>
               </label>
             </div>
@@ -508,7 +515,7 @@ export const DiscographySection: React.FC = () => {
               {filteredChronologyBlocks.map((block) => (
                 <div
                   key={block.id}
-                  className="theme-surface border theme-border p-6 md:p-8 space-y-6"
+                  className="chronology-era-block theme-surface border theme-border hover:border-[#FF5A1F]/60 transition-colors duration-300 p-6 md:p-8 space-y-6"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b theme-border">
                     <div className="space-y-1.5 max-w-3xl">
@@ -541,7 +548,7 @@ export const DiscographySection: React.FC = () => {
                         href={block.projectSpotifyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2.5 theme-bg border theme-border-strong text-xs font-semibold theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 shrink-0"
+                        className="group inline-flex items-center gap-2 px-4 py-2.5 theme-bg border theme-border-strong text-xs font-semibold theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] hover:-translate-y-0.5 transition-all duration-200 shrink-0"
                       >
                         <SocialBrandLogo
                           platform="spotify"
@@ -552,12 +559,14 @@ export const DiscographySection: React.FC = () => {
                             ? block.projectSpotifyLabelFr
                             : block.projectSpotifyLabelEn}
                         </span>
-                        <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        <ArrowUpRight
+                          className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                          aria-hidden="true"
+                        />
                       </a>
                     )}
                   </div>
 
-                  {/* Alerte méthodologique éventuelle (ex. distinction single 2018 / album 2019 pour Prends seulement ta part) */}
                   {block.methodologyAlertFr && (
                     <div className="p-4 theme-bg border border-[#FF5A1F]/50 flex items-start gap-3 text-xs">
                       <AlertCircle
@@ -572,7 +581,6 @@ export const DiscographySection: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Tableau / Liste des morceaux de la période */}
                   <ul className="divide-y theme-border border-t border-b">
                     {block.tracks.map((track, idx) => {
                       const collab =
@@ -593,7 +601,7 @@ export const DiscographySection: React.FC = () => {
                       return (
                         <li
                           key={track.id}
-                          className="py-3.5 px-2 sm:px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:theme-bg transition-colors duration-150"
+                          className="group py-3.5 px-2 sm:px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:theme-bg hover:pl-4 border-l-2 border-l-transparent hover:border-l-[#FF5A1F] transition-all duration-200"
                         >
                           <div className="flex items-baseline gap-3.5">
                             <span className="text-xs font-semibold theme-accent-text w-7 shrink-0 tabular-nums">
@@ -603,7 +611,7 @@ export const DiscographySection: React.FC = () => {
                             </span>
                             <div className="space-y-0.5">
                               <div className="flex flex-wrap items-baseline gap-2">
-                                <span className="text-sm md:text-base font-semibold theme-text">
+                                <span className="text-sm md:text-base font-semibold theme-text group-hover:text-[#FF5A1F] transition-colors duration-150">
                                   {track.title}
                                 </span>
                                 {collab && (
@@ -631,7 +639,7 @@ export const DiscographySection: React.FC = () => {
                               href={track.spotifyUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors duration-150 whitespace-nowrap ${
+                              className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap ${
                                 isConfirmed
                                   ? 'theme-accent-bg hover:opacity-90'
                                   : 'theme-bg border theme-border-strong theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F]'
@@ -722,9 +730,7 @@ export const DiscographySection: React.FC = () => {
 
               <div className="p-4 theme-bg border theme-border space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wider theme-muted">
-                  {language === 'fr'
-                    ? 'Informations documentées :'
-                    : 'Documented information:'}
+                  {language === 'fr' ? 'Points clés :' : 'Key highlights:'}
                 </p>
                 <ul className="space-y-1.5 text-xs md:text-sm">
                   {(language === 'fr'
@@ -743,33 +749,28 @@ export const DiscographySection: React.FC = () => {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider theme-muted mb-2.5">
                     {language === 'fr'
-                      ? `Pistes documentées (${selectedProject.documentedTracksFr.length}) :`
-                      : `Documented tracks (${selectedProject.documentedTracksEn.length}):`}
+                      ? `Tracklist (${selectedProject.documentedTracksFr.length}) :`
+                      : `Tracklist (${selectedProject.documentedTracksEn.length}):`}
                   </p>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm theme-text p-4 theme-bg border theme-border max-h-64 overflow-y-auto">
                     {(language === 'fr'
                       ? selectedProject.documentedTracksFr
                       : selectedProject.documentedTracksEn
                     ).map((trk, idx) => (
-                      <li key={idx} className="py-1 border-b theme-border last:border-b-0">
-                        {trk}
+                      <li
+                        key={idx}
+                        className="py-1 border-b theme-border last:border-b-0 flex items-center gap-2"
+                      >
+                        <Disc
+                          className="w-3.5 h-3.5 theme-accent-text shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>{trk}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
-
-              <div className="text-xs theme-muted flex items-center gap-2 pt-2">
-                <Disc
-                  className="w-4 h-4 theme-accent-text shrink-0"
-                  aria-hidden="true"
-                />
-                <span>
-                  {language === 'fr'
-                    ? 'Note éditoriale : Les pochettes officielles haute définition et crédits complets de production seront affichés après transmission par l’équipe de l’artiste.'
-                    : 'Editorial note: High-definition official cover art and full production credits will be displayed once provided by the artist’s team.'}
-                </span>
-              </div>
             </div>
 
             <div className="mt-8 pt-4 border-t theme-border flex flex-wrap items-center justify-between gap-4">
