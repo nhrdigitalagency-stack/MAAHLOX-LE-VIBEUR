@@ -1,0 +1,210 @@
+@import "tailwindcss";
+@custom-variant light (&:where(.light, .light *));
+
+:root,
+html.dark,
+.dark,
+[data-theme="dark"] {
+  --background: #080808;
+  --surface: #141414;
+  --surface-elevated: #1E1E1E;
+  --text: #F5F1E8;
+  --muted: #A8A29A;
+  --accent: #FF5A1F;
+  --accent-contrast: #080808;
+  --highlight: #DFFF00;
+  --border-hairline: rgba(245, 241, 232, 0.14);
+  --border-strong: rgba(245, 241, 232, 0.28);
+  --header-scrim: rgba(8, 8, 8, 0.88);
+  --modal-backdrop: rgba(8, 8, 8, 0.88);
+  --hero-scrim-start: rgba(8, 8, 8, 0.72);
+  --hero-scrim-mid: rgba(8, 8, 8, 0.36);
+  --hero-scrim-end: rgba(8, 8, 8, 0.14);
+  --hero-scrim-top: rgba(8, 8, 8, 0.42);
+  --hero-scrim-bottom: rgba(8, 8, 8, 0.82);
+  --font-display: 'Anton', Impact, sans-serif;
+  --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+:root.light,
+html.light,
+.light,
+[data-theme="light"] {
+  --background: #F6F3EC;
+  --surface: #EAE5D9;
+  --surface-elevated: #FFFFFF;
+  --text: #121110;
+  --muted: #5C574F;
+  --accent: #E0480F;
+  --accent-contrast: #FFFFFF;
+  --highlight: #9E6B00;
+  --border-hairline: rgba(18, 17, 16, 0.14);
+  --border-strong: rgba(18, 17, 16, 0.28);
+  --header-scrim: rgba(246, 243, 236, 0.92);
+  --modal-backdrop: rgba(18, 17, 16, 0.75);
+  --hero-scrim-start: rgba(8, 8, 8, 0.68);
+  --hero-scrim-mid: rgba(8, 8, 8, 0.30);
+  --hero-scrim-end: rgba(8, 8, 8, 0.10);
+  --hero-scrim-top: rgba(8, 8, 8, 0.35);
+  --hero-scrim-bottom: rgba(8, 8, 8, 0.78);
+}
+
+@layer base {
+  html {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: var(--font-sans);
+    letter-spacing: 0.005em;
+    scroll-behavior: smooth;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  body,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100svh;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* Monumental poster display headings */
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+
+  /* Consistent Poppins UI & body typography */
+  .font-poppins {
+    font-family: var(--font-sans);
+  }
+
+  /* Technical metadata & indices using Poppins with tabular numerals for a unified premium feel */
+  .font-mono-tech {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  /* Accessible focus ring across all interactive elements */
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+/* Theme utility classes for seamless Dark / Light adaptation */
+.theme-bg {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.theme-surface {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.theme-surface-elevated {
+  background-color: var(--surface-elevated);
+  color: var(--text);
+}
+
+.theme-text {
+  color: var(--text);
+}
+
+.theme-muted {
+  color: var(--muted);
+}
+
+.theme-accent-text {
+  color: var(--accent);
+}
+
+.theme-accent-bg {
+  background-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.theme-border {
+  border-color: var(--border-hairline);
+}
+
+.theme-border-strong {
+  border-color: var(--border-strong);
+}
+
+/* Subtle film grain overlay (non-blocking) */
+.film-grain {
+  background-image: radial-gradient(rgba(245, 241, 232, 0.055) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* UI transitions (200-450ms) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0.85;
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Signature Effect 3: Subtle depth hover on release cards & merch cards (Desktop fine pointer only) */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .release-project-card,
+  .merch-depth-card {
+    transition:
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 200ms ease,
+      box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .release-project-card:hover,
+  .merch-depth-card:hover {
+    transform: translate3d(0, -6px, 0) scale(1.008);
+    box-shadow: 0 20px 42px -16px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* Reduced motion strict compliance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

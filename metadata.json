@@ -1,0 +1,6 @@
+{
+  "name": "MAAHLOX LE VIBEUR — Concept Portfolio",
+  "description": "Concept de portfolio musical immersif et éditorial consacré à Maahlox Le Vibeur (Jean-Jules Kenfack), rappeur et chanteur camerounais originaire de Yaoundé.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
