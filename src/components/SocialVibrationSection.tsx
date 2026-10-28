@@ -1,15 +1,60 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowUpRight, Info } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Facebook,
+  Info,
+  Instagram,
+  Radio,
+  Youtube,
+} from 'lucide-react';
 import {
   getActivePublicSocials,
   getPendingVerificationSocials,
+  SocialPlatformId,
 } from '../data/socials';
-import { BRAND_HEX_COLORS, SocialBrandLogo } from './SocialBrandLogo';
+import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 gsap.registerPlugin(ScrollTrigger);
+
+/**
+ * Composant d'icône stylisé avec le thème orange accent (#FF5A1F)
+ * associant les logos officiels (Facebook, YouTube, SoundCloud, Instagram, Spotify)
+ * et les icônes Lucide React.
+ */
+const StyledOrangeSocialIcon: React.FC<{
+  platform: SocialPlatformId;
+  sizeClass?: string;
+}> = ({ platform, sizeClass = 'w-6 h-6' }) => {
+  return (
+    <span
+      className="inline-flex items-center justify-center text-[#FF5A1F] transition-transform duration-200 group-hover:scale-110"
+      aria-hidden="true"
+    >
+      <SocialBrandLogo platform={platform} className={sizeClass} />
+    </span>
+  );
+};
+
+export const LucidePlatformBadgeIcon: React.FC<{
+  platform: SocialPlatformId;
+  className?: string;
+}> = ({ platform, className = 'w-3.5 h-3.5 text-[#FF5A1F]' }) => {
+  switch (platform) {
+    case 'facebook':
+      return <Facebook className={className} aria-hidden="true" />;
+    case 'youtube':
+      return <Youtube className={className} aria-hidden="true" />;
+    case 'instagram':
+      return <Instagram className={className} aria-hidden="true" />;
+    case 'soundcloud':
+    case 'spotify':
+    default:
+      return <Radio className={className} aria-hidden="true" />;
+  }
+};
 
 export const SocialVibrationSection: React.FC = () => {
   const { language, environmentMode } = useAppSettings();
@@ -78,103 +123,105 @@ export const SocialVibrationSection: React.FC = () => {
 
           <p className="text-sm md:text-base theme-muted max-w-md leading-relaxed">
             {language === 'fr'
-              ? 'Accès direct aux canaux en ligne documentés avec leurs logos officiels. Aucun faux flux social ni compteur d’abonnés non synchronisé n’est affiché.'
-              : 'Direct access to documented online channels with their official logos. No simulated social feeds or unsynchronized follower counts are displayed.'}
+              ? 'Accès direct aux canaux en ligne documentés avec leurs logos officiels stylisés avec l’accent orange. Aucun faux flux social ni compteur d’abonnés non synchronisé n’est affiché.'
+              : 'Direct access to documented online channels with their official logos styled in our orange accent theme. No simulated social feeds or unsynchronized follower counts are displayed.'}
           </p>
         </div>
 
-        {/* Cartes sociales asymétriques — chaque carte est une vraie ancre HTML <a> avec le logo du réseau social */}
+        {/* Cartes sociales asymétriques — chaque carte affiche le logo officiel stylisé en orange accent à côté du lien */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {activeSocials.map((social, idx) => {
-            const brandHex = BRAND_HEX_COLORS[social.platform];
-
-            return (
-              <a
-                key={social.id}
-                href={social.url || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${social.label[language]} — ${
-                  social.statusBadge[language]
-                } (${
-                  language === 'fr'
-                    ? 's’ouvre dans un nouvel onglet'
-                    : 'opens in a new tab'
-                })`}
-                className={`social-vibration-card ${social.cardSpanClass} relative overflow-hidden group block p-6 md:p-8 theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-250 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-[#FF5A1F]`}
+          {activeSocials.map((social, idx) => (
+            <a
+              key={social.id}
+              href={social.url || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${social.label[language]} — ${
+                social.statusBadge[language]
+              } (${
+                language === 'fr'
+                  ? 's’ouvre dans un nouvel onglet'
+                  : 'opens in a new tab'
+              })`}
+              className={`social-vibration-card ${social.cardSpanClass} relative overflow-hidden group block p-6 md:p-8 theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-250 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-[#FF5A1F]`}
+            >
+              {/* Filigrane décoratif du logo officiel en accent orange subtil */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-5 -bottom-5 text-[#FF5A1F] opacity-[0.06] group-hover:opacity-[0.14] transition-all duration-300 group-hover:scale-105"
               >
-                {/* Filigrane géant du logo officiel en arrière-plan de la carte */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-6 -bottom-6 opacity-[0.045] group-hover:opacity-[0.11] transition-all duration-300 group-hover:scale-105"
-                  style={{ color: brandHex }}
-                >
-                  <SocialBrandLogo
-                    platform={social.platform}
-                    className="w-40 h-40"
-                  />
-                </div>
+                <SocialBrandLogo
+                  platform={social.platform}
+                  className="w-36 h-36"
+                />
+              </div>
 
-                <div className="relative z-10 flex items-start justify-between gap-4 mb-8">
-                  <div className="inline-flex items-center gap-4">
-                    {/* Médaillon logo officiel avec accent de la plateforme */}
-                    <span className="relative inline-flex items-center justify-center w-14 h-14 theme-bg border theme-border-strong group-hover:border-[#FF5A1F] transition-colors duration-200 shrink-0 shadow-md">
-                      <SocialBrandLogo
-                        platform={social.platform}
-                        useBrandColor
-                        className="w-7 h-7 transition-transform duration-200 group-hover:scale-110"
-                      />
-                    </span>
-                    <div>
-                      <span className="block text-xs font-semibold uppercase tracking-widest theme-muted">
-                        0{idx + 1} · {social.platformName}
-                      </span>
-                      <span className="block text-xs theme-accent-text font-medium mt-0.5">
-                        {social.statusBadge[language]}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Flèche externe discrète avec léger déplacement au survol */}
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 theme-bg border theme-border text-xs font-medium theme-muted group-hover:text-[#FF5A1F] group-hover:border-[#FF5A1F] transition-colors duration-200">
-                    <span className="hidden sm:inline">
-                      {language === 'fr' ? 'Ouvrir' : 'Open'}
-                    </span>
-                    <ArrowUpRight
-                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      aria-hidden="true"
+              <div className="relative z-10 flex items-start justify-between gap-4 mb-8">
+                <div className="inline-flex items-center gap-4">
+                  {/* Boîtier d'icône officielle stylisé avec le thème orange accent */}
+                  <span className="inline-flex items-center justify-center w-14 h-14 theme-bg border border-[#FF5A1F]/40 bg-[#FF5A1F]/10 text-[#FF5A1F] group-hover:border-[#FF5A1F] group-hover:bg-[#FF5A1F] group-hover:text-[#080808] transition-colors duration-200 shrink-0 shadow-md">
+                    <SocialBrandLogo
+                      platform={social.platform}
+                      className="w-7 h-7 transition-transform duration-200 group-hover:scale-110"
                     />
                   </span>
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest theme-muted">
+                      <LucidePlatformBadgeIcon platform={social.platform} />
+                      <span>
+                        0{idx + 1} · {social.platformName}
+                      </span>
+                    </span>
+                    <span className="block text-xs theme-accent-text font-medium mt-0.5">
+                      {social.statusBadge[language]}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="relative z-10 space-y-2">
+                {/* Flèche externe Lucide avec accent orange au survol */}
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 theme-bg border theme-border text-xs font-semibold theme-text group-hover:text-[#FF5A1F] group-hover:border-[#FF5A1F] transition-colors duration-200">
+                  <span className="hidden sm:inline">
+                    {language === 'fr' ? 'Accéder' : 'Visit'}
+                  </span>
+                  <ArrowUpRight
+                    className="w-4 h-4 text-[#FF5A1F] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                </span>
+              </div>
+
+              <div className="relative z-10 space-y-2">
+                <div className="flex items-center gap-3">
+                  <StyledOrangeSocialIcon
+                    platform={social.platform}
+                    sizeClass="w-6 h-6 shrink-0"
+                  />
                   <h3 className="font-display text-3xl md:text-4xl theme-text group-hover:text-[#FF5A1F] transition-colors duration-200 tracking-wide">
                     {social.label[language]}
                   </h3>
-                  <p className="text-sm theme-muted leading-relaxed max-w-2xl">
-                    {social.editorialDescription[language]}
-                  </p>
                 </div>
+                <p className="text-sm theme-muted leading-relaxed max-w-2xl">
+                  {social.editorialDescription[language]}
+                </p>
+              </div>
 
-                <div className="relative z-10 mt-6 pt-4 border-t theme-border flex flex-wrap items-center justify-between gap-2 text-xs theme-muted">
-                  <span className="inline-flex items-center gap-2 font-semibold theme-text">
-                    <SocialBrandLogo
-                      platform={social.platform}
-                      useBrandColor
-                      className="w-4 h-4"
-                    />
-                    <span>{social.handleOrChannel}</span>
-                  </span>
-                  <span className="truncate max-w-[280px] sm:max-w-md opacity-75">
-                    {social.url}
-                  </span>
-                </div>
-              </a>
-            );
-          })}
+              <div className="relative z-10 mt-6 pt-4 border-t theme-border flex flex-wrap items-center justify-between gap-2 text-xs theme-muted">
+                <span className="inline-flex items-center gap-2 font-semibold theme-text">
+                  <SocialBrandLogo
+                    platform={social.platform}
+                    className="w-4 h-4 text-[#FF5A1F]"
+                  />
+                  <span>{social.handleOrChannel}</span>
+                </span>
+                <span className="truncate max-w-[280px] sm:max-w-md opacity-80 group-hover:text-[#FF5A1F] transition-colors duration-150">
+                  {social.url}
+                </span>
+              </div>
+            </a>
+          ))}
         </div>
 
-        {/* En mode preview uniquement : transparence sur Instagram candidat et TikTok non confirmé (sans afficher l'icône TikTok tant que l'URL n'est pas fournie) */}
+        {/* En mode preview uniquement : transparence sur Instagram candidat (avec son logo orange accent) et TikTok non confirmé */}
         {environmentMode === 'preview' && pendingSocials.length > 0 && (
           <div className="mt-8 p-5 md:p-6 theme-surface border theme-border space-y-4">
             <div className="flex items-start gap-3">
@@ -205,10 +252,9 @@ export const SocialVibrationSection: React.FC = () => {
                   <div className="flex items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-2.5 font-semibold theme-text">
                       {item.platform === 'instagram' && (
-                        <span className="inline-flex items-center justify-center w-7 h-7 theme-surface border theme-border">
+                        <span className="inline-flex items-center justify-center w-8 h-8 border border-[#FF5A1F]/40 bg-[#FF5A1F]/10 text-[#FF5A1F]">
                           <SocialBrandLogo
                             platform="instagram"
-                            useBrandColor
                             className="w-4 h-4"
                           />
                         </span>

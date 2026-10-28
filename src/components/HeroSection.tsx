@@ -101,43 +101,27 @@ export const HeroSection: React.FC = () => {
             width={1920}
             height={1080}
             onError={() => setImageError(true)}
-            className="h-full w-full object-cover object-[56%_18%] opacity-75 contrast-[1.06] saturate-[1.04] transition-opacity duration-300"
+            className="h-full w-full object-cover object-[58%_18%] opacity-95 brightness-[1.06] contrast-[1.08] saturate-[1.08] transition-opacity duration-300"
           />
         )}
 
-        {/* 1. Scrim directionnel principal à couverture étendue : garantit la lisibilité parfaite du texte à gauche et au centre */}
+        {/* Overlay unique à dégradé CSS complexe et profond couvrant toute la surface de l'image :
+            - Protège intégralement le titre monumental MAAHLOX et les textes à gauche (--hero-scrim-start -> --hero-scrim-mid)
+            - Dégage clairement la silhouette et le visage de l'artiste sur la moitié droite (--hero-scrim-end) */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 transition-colors duration-300"
+          className="absolute inset-0 w-full h-full transition-colors duration-300"
           style={{
-            background:
-              'linear-gradient(102deg, var(--hero-scrim-start) 0%, rgba(8, 8, 8, 0.88) 36%, var(--hero-scrim-mid) 64%, var(--hero-scrim-end) 100%)',
-          }}
-        />
-
-        {/* 2. Scrim vertical d'ancrage haut/bas : protège le Header Bubble en haut et la barre éditoriale en bas */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 transition-colors duration-300"
-          style={{
-            background:
-              'linear-gradient(180deg, var(--hero-scrim-top) 0%, rgba(8, 8, 8, 0.38) 35%, rgba(8, 8, 8, 0.48) 68%, var(--hero-scrim-bottom) 100%)',
-          }}
-        />
-
-        {/* 3. Halo radial sombre de protection typographique sous la colonne éditoriale gauche + lueur scénique ambrée à droite */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 68% 75% at 24% 54%, rgba(8, 8, 8, 0.72) 0%, transparent 75%), radial-gradient(circle at 72% 32%, rgba(255, 90, 31, 0.14) 0%, transparent 62%)',
+            background: [
+              'linear-gradient(100deg, var(--hero-scrim-start) 0%, var(--hero-scrim-start) 22%, var(--hero-scrim-mid) 52%, var(--hero-scrim-end) 82%, rgba(8, 8, 8, 0.12) 100%)',
+              'linear-gradient(180deg, var(--hero-scrim-top) 0%, rgba(8, 8, 8, 0.05) 28%, rgba(8, 8, 8, 0.08) 74%, var(--hero-scrim-bottom) 100%)',
+              'radial-gradient(circle at 70% 34%, rgba(255, 90, 31, 0.16) 0%, transparent 58%)',
+            ].join(', '),
           }}
         />
 
         {/* Effet signature 2 : Vibration lumineuse discrète sans flashes */}
         <StageVibrationCanvas />
-        <div className="film-grain absolute inset-0" aria-hidden="true" />
       </div>
 
       {/* Barre d'outils d'expérience (Langue FR/EN, Thème Sombre/Clair & Mode Preview/Production) */}
