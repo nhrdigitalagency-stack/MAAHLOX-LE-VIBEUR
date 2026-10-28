@@ -1,14 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowUpRight, Disc, Info, VolumeX, X } from 'lucide-react';
 import {
+  AlertCircle,
+  ArrowUpRight,
+  Disc,
+  Info,
+  Search,
+  VolumeX,
+  X,
+} from 'lucide-react';
+import {
+  ChronologyEraGroup,
+  documentedChronologyData,
   optionalAudioConfig,
   ReleaseProject,
   releasesData,
 } from '../data/releases';
-import { artistData } from '../data/artist';
 import { DecorativeAudioVisualizer } from './DecorativeAudioVisualizer';
+import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -18,13 +28,60 @@ export const DiscographySection: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<ReleaseProject | null>(
     null
   );
+  const [selectedEraGroup, setSelectedEraGroup] =
+    useState<ChronologyEraGroup>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [onlyConfirmedSpotify, setOnlyConfirmedSpotify] = useState(false);
+
   const sectionRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const cardsGridRef = useRef<HTMLDivElement | null>(null);
-  const repertoireRef = useRef<HTMLDivElement | null>(null);
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
   const modalCloseBtnRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
+
+  const totalDocumentedTracksCount = useMemo(
+    () =>
+      documentedChronologyData.reduce(
+        (acc, block) => acc + block.tracks.length,
+        0
+      ),
+    []
+  );
+
+  const filteredChronologyBlocks = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+
+    return documentedChronologyData
+      .filter((block) =>
+        selectedEraGroup === 'all' ? true : block.eraGroup === selectedEraGroup
+      )
+      .map((block) => {
+        const filteredTracks = block.tracks.filter((track) => {
+          if (onlyConfirmedSpotify && track.spotifyAction !== 'listen_confirmed') {
+            return false;
+          }
+          if (!q) return true;
+          const haystack = [
+            track.title,
+            track.artistsOrCollabFr || '',
+            track.artistsOrCollabEn || '',
+            track.dateOrPeriodFr,
+            track.dateOrPeriodEn,
+            block.periodTitleFr,
+          ]
+            .join(' ')
+            .toLowerCase();
+          return haystack.includes(q);
+        });
+
+        return {
+          ...block,
+          tracks: filteredTracks,
+        };
+      })
+      .filter((block) => block.tracks.length > 0);
+  }, [selectedEraGroup, searchQuery, onlyConfirmedSpotify]);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -63,24 +120,6 @@ export const DiscographySection: React.FC = () => {
             scrollTrigger: {
               trigger: cardsGridRef.current,
               start: 'top 82%',
-            },
-          }
-        );
-      }
-
-      if (repertoireRef.current) {
-        gsap.fromTo(
-          '.repertoire-track-item',
-          { y: 18, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            stagger: 0.05,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: repertoireRef.current,
-              start: 'top 85%',
             },
           }
         );
@@ -148,6 +187,38 @@ export const DiscographySection: React.FC = () => {
     };
   }, [selectedProject]);
 
+  const eraFilterButtons: {
+    id: ChronologyEraGroup;
+    labelFr: string;
+    labelEn: string;
+  }[] = [
+    {
+      id: 'all',
+      labelFr: `Toute la chronologie (${totalDocumentedTracksCount})`,
+      labelEn: `Full chronology (${totalDocumentedTracksCount})`,
+    },
+    {
+      id: '2012-2017',
+      labelFr: '2012 – 2017 (Débuts & Ça sort comme ça sort)',
+      labelEn: '2012 – 2017 (Early & Ça sort comme ça sort)',
+    },
+    {
+      id: '2018-2021',
+      labelFr: '2018 – 2021 (Singles & Prends seulement ta part)',
+      labelEn: '2018 – 2021 (Singles & Prends seulement ta part)',
+    },
+    {
+      id: '2022-2023',
+      labelFr: '2022 – 2023 (Singles & Collaborations)',
+      labelEn: '2022 – 2023 (Singles & Collaborations)',
+    },
+    {
+      id: '2024-2026',
+      labelFr: '2024 – 2026 (Izacam Vol. 1 & Sorties récentes)',
+      labelEn: '2024 – 2026 (Izacam Vol. 1 & Recent releases)',
+    },
+  ];
+
   return (
     <section
       id="musique"
@@ -156,32 +227,57 @@ export const DiscographySection: React.FC = () => {
       className="relative py-20 md:py-32 theme-bg border-b theme-border transition-colors duration-250 font-poppins"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
-        {/* En-tête de section */}
+        {/* En-tête de section + Lien direct vers le profil Spotify */}
         <div
           ref={headerRef}
-          className="flex flex-wrap items-baseline justify-between gap-4 pb-6 mb-12 border-b theme-border"
+          className="flex flex-wrap items-end justify-between gap-6 pb-8 mb-12 border-b theme-border"
         >
           <div>
             <p className="text-xs md:text-sm font-semibold uppercase tracking-widest theme-accent-text mb-2">
               {language === 'fr'
-                ? '03. Discographie & Répertoire'
-                : '03. Discography & Repertoire'}
+                ? '03. Discographie & Catalogue Chronologique (2012 – 2026)'
+                : '03. Discography & Chronological Catalog (2012 – 2026)'}
             </p>
             <h2
               id="discographie-heading"
               className="font-display text-4xl md:text-6xl theme-text tracking-tight"
             >
-              {language === 'fr' ? 'LES PROJETS' : 'PROJECTS'}
+              {language === 'fr'
+                ? 'PROJETS & TOUS LES SONS DOCUMENTÉS'
+                : 'PROJECTS & ALL DOCUMENTED TRACKS'}
             </h2>
           </div>
-          <p className="text-xs theme-muted font-medium">
-            {language === 'fr'
-              ? '4 projets documentés (2013 – 2024) · Sélection non exhaustive'
-              : '4 documented projects (2013 – 2024) · Non-exhaustive selection'}
-          </p>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href="https://open.spotify.com/search/Maahlox%20Le%20Vibeur"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 px-5 py-3 theme-accent-bg font-poppins font-semibold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity duration-150 whitespace-nowrap shrink-0"
+            >
+              <SocialBrandLogo platform="spotify" className="w-4 h-4" />
+              <span>
+                {language === 'fr'
+                  ? 'Profil Spotify : Maahlox Le Vibeur'
+                  : 'Spotify Profile: Maahlox Le Vibeur'}
+              </span>
+              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+            </a>
+
+            <a
+              href="https://www.deezer.com/fr/search/Maahlox%20Le%20Vibeur"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-3 theme-surface border theme-border-strong font-poppins font-semibold text-xs uppercase tracking-wider theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
+            >
+              <SocialBrandLogo platform="deezer" className="w-4 h-4" />
+              <span>Deezer</span>
+              <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </a>
+          </div>
         </div>
 
-        {/* Grille des 4 projets */}
+        {/* Grille des 4 projets repères */}
         <div
           ref={cardsGridRef}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
@@ -189,10 +285,10 @@ export const DiscographySection: React.FC = () => {
           {releasesData.map((project) => (
             <article
               key={project.id}
-              className="release-project-card group theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-200 hover:-translate-y-1 flex flex-col justify-between"
+              className="release-project-card group theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-200 flex flex-col justify-between"
             >
               <div>
-                {/* Composition typographique temporaire (toujours sombre pour l'effet pochette vinyle/affiche) */}
+                {/* Composition typographique temporaire */}
                 <div className="relative aspect-square w-full bg-[#080808] text-[#F5F1E8] border-b theme-border p-6 flex flex-col justify-between overflow-hidden">
                   <div className="flex items-center justify-between text-xs font-medium text-[#A8A29A]">
                     <span>{project.typographicPosterCode.indexNumber}</span>
@@ -217,8 +313,8 @@ export const DiscographySection: React.FC = () => {
                   <div className="pt-3 border-t border-[#F5F1E8]/12 flex items-center justify-between text-[11px] text-[#A8A29A]">
                     <span>
                       {language === 'fr'
-                        ? 'Composition typographique temporaire'
-                        : 'Temporary typographic artwork'}
+                        ? `${project.documentedTracksFr.length} pistes documentées`
+                        : `${project.documentedTracksEn.length} documented tracks`}
                     </span>
                     <span>{project.typographicPosterCode.shortCode}</span>
                   </div>
@@ -252,7 +348,9 @@ export const DiscographySection: React.FC = () => {
                     aria-hidden="true"
                   />
                   <span>
-                    {language === 'fr' ? 'Fiche détaillée' : 'Project details'}
+                    {language === 'fr'
+                      ? `Tracklist (${project.documentedTracksFr.length})`
+                      : `Tracklist (${project.documentedTracksEn.length})`}
                   </span>
                 </button>
 
@@ -266,9 +364,10 @@ export const DiscographySection: React.FC = () => {
                         ? project.verifiedListenLinks[0].labelFr
                         : project.verifiedListenLinks[0].labelEn
                     } — ${project.title}`}
-                    className="inline-flex items-center gap-1 text-xs font-medium theme-muted hover:theme-text transition-colors duration-150 whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium theme-muted hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
                   >
-                    <span>Deezer</span>
+                    <SocialBrandLogo platform="spotify" className="w-3.5 h-3.5" />
+                    <span>Spotify</span>
                     <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
                   </a>
                 )}
@@ -282,25 +381,29 @@ export const DiscographySection: React.FC = () => {
           <DecorativeAudioVisualizer variant="studio-panel" />
         </div>
 
-        {/* Sélection de titres documentés */}
-        <div
-          ref={repertoireRef}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-8 border-t theme-border"
-        >
-          <div className="lg:col-span-4 space-y-4">
-            <h3 className="font-display text-3xl md:text-4xl theme-text">
-              {language === 'fr'
-                ? 'SÉLECTION DE TITRES DOCUMENTÉS'
-                : 'DOCUMENTED TRACK SELECTION'}
-            </h3>
-            <p className="text-sm theme-muted leading-relaxed">
-              {language === 'fr'
-                ? 'Titres mis en avant dans les présentations de son parcours entre le début des années 2010 et ses projets récents. Cette sélection n’est pas exhaustive.'
-                : 'Tracks highlighted across presentations of his career from the early 2010s to recent releases. This list is non-exhaustive.'}
-            </p>
+        {/* CATALOGUE CHRONOLOGIQUE COMPLET (11 PÉRIODES · 2012 – 2026) */}
+        <div className="pt-10 border-t theme-border space-y-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div className="space-y-2 max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-widest theme-accent-text">
+                {language === 'fr'
+                  ? 'Répertoire chronologique vérifié (Qobuz, Spotify, Stillac, Audiomack, Shazam, Soundcharts)'
+                  : 'Verified chronological repertoire (Qobuz, Spotify, Stillac, Audiomack, Shazam, Soundcharts)'}
+              </p>
+              <h3 className="font-display text-3xl md:text-5xl theme-text tracking-tight">
+                {language === 'fr'
+                  ? `CHRONOLOGIE DES SORTIES (${totalDocumentedTracksCount} MORCEAUX RECENSÉS)`
+                  : `RELEASE CHRONOLOGY (${totalDocumentedTracksCount} INDEXED TRACKS)`}
+              </h3>
+              <p className="text-sm theme-muted leading-relaxed">
+                {language === 'fr'
+                  ? 'Distinction stricte entre les pistes dont la présence directe sur Spotify est confirmée (« Écouter ») et les autres titres documentés (« Rechercher » — sans garantie de disponibilité sur la plateforme).'
+                  : 'Strict distinction between tracks with confirmed direct availability on Spotify (“Listen”) and other documented tracks (“Search” — availability on the platform not guaranteed).'}
+              </p>
+            </div>
 
             {!optionalAudioConfig.isEnabled && (
-              <div className="p-4 theme-surface border theme-border text-xs theme-muted space-y-1.5">
+              <div className="p-4 theme-surface border theme-border text-xs theme-muted max-w-md space-y-1">
                 <div className="flex items-center gap-2 theme-text font-semibold">
                   <VolumeX
                     className="w-4 h-4 theme-accent-text shrink-0"
@@ -308,73 +411,265 @@ export const DiscographySection: React.FC = () => {
                   />
                   <span>
                     {language === 'fr'
-                      ? 'Lecteur audio direct en attente d’extraits autorisés'
-                      : 'Direct audio player awaiting authorized excerpts'}
+                      ? 'Écoute externe via Spotify / Deezer'
+                      : 'External listening via Spotify / Deezer'}
                   </span>
                 </div>
                 <p className="leading-relaxed">
                   {language === 'fr'
-                    ? 'Conformément à la charte du projet, aucun lecteur simulé n’est affiché tant que les fichiers maîtres autorisés par les ayants droit ne sont pas fournis.'
-                    : 'In accordance with project guidelines, no simulated player is shown until master audio files authorized by rights holders are provided.'}
+                    ? 'Aucun lecteur audio interne simulé n’est affiché tant que les extraits maîtres autorisés ne sont pas fournis.'
+                    : 'No simulated built-in audio player is shown until authorized master audio excerpts are provided.'}
                 </p>
               </div>
             )}
           </div>
 
-          <div className="lg:col-span-8">
-            <ul className="divide-y theme-border border-t border-b">
-              {artistData.repertoireSelection.map((track, index) => {
-                const note =
-                  language === 'fr' ? track.noteFr : track.noteEn;
-                const yearCtx =
-                  language === 'fr'
-                    ? track.yearContextFr
-                    : track.yearContextEn;
+          {/* Barre de filtres par période + Recherche instantanée + Filtre pistes Spotify confirmées */}
+          <div className="p-5 theme-surface border theme-border space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {eraFilterButtons.map((btn) => {
+                const active = selectedEraGroup === btn.id;
                 return (
-                  <li
-                    key={track.title}
-                    className="repertoire-track-item py-3.5 px-2 flex flex-wrap items-center justify-between gap-4 hover:theme-surface transition-colors duration-150"
+                  <button
+                    key={btn.id}
+                    type="button"
+                    onClick={() => setSelectedEraGroup(btn.id)}
+                    aria-pressed={active}
+                    className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border transition-colors duration-150 ${
+                      active
+                        ? 'theme-accent-bg border-[#FF5A1F]'
+                        : 'theme-bg theme-text theme-border hover:border-[#FF5A1F]'
+                    }`}
                   >
-                    <div className="flex items-baseline gap-4">
-                      <span className="text-xs font-semibold theme-accent-text w-6">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <span className="text-base font-medium theme-text">
-                        {track.title}
-                      </span>
-                      {note && (
-                        <span className="text-xs theme-muted">· {note}</span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      {yearCtx && (
-                        <span className="text-xs theme-muted">{yearCtx}</span>
-                      )}
-                      <a
-                        href={`https://www.deezer.com/fr/search/${encodeURIComponent(
-                          `Maahlox Le Vibeur ${track.title}`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-medium theme-muted hover:text-[#FF5A1F] transition-colors duration-150 whitespace-nowrap shrink-0"
-                      >
-                        <span>
-                          {language === 'fr'
-                            ? 'Rechercher sur Deezer'
-                            : 'Search on Deezer'}
-                        </span>
-                        <ArrowUpRight
-                          className="w-3.5 h-3.5"
-                          aria-hidden="true"
-                        />
-                      </a>
-                    </div>
-                  </li>
+                    {language === 'fr' ? btn.labelFr : btn.labelEn}
+                  </button>
                 );
               })}
-            </ul>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t theme-border">
+              <div className="relative flex-1 max-w-md">
+                <Search
+                  className="w-4 h-4 theme-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={
+                    language === 'fr'
+                      ? 'Rechercher un titre, une année ou une collaboration (ex. Koppo, Black M, Magasco)...'
+                      : 'Search a track, year, or collaboration (e.g. Koppo, Black M, Magasco)...'
+                  }
+                  aria-label={
+                    language === 'fr'
+                      ? 'Filtrer les morceaux par titre ou artiste associé'
+                      : 'Filter tracks by title or featured artist'
+                  }
+                  className="w-full pl-10 pr-4 py-2.5 theme-bg border theme-border-strong text-xs md:text-sm theme-text placeholder:opacity-55 focus:border-[#FF5A1F]"
+                />
+              </div>
+
+              <label className="inline-flex items-center gap-2.5 cursor-pointer text-xs font-medium theme-text select-none">
+                <input
+                  type="checkbox"
+                  checked={onlyConfirmedSpotify}
+                  onChange={(e) => setOnlyConfirmedSpotify(e.target.checked)}
+                  className="w-4 h-4 accent-[#FF5A1F]"
+                />
+                <span>
+                  {language === 'fr'
+                    ? 'Afficher uniquement les pistes Spotify directement confirmées (« Écouter »)'
+                    : 'Show only directly confirmed Spotify tracks (“Listen”)'}
+                </span>
+              </label>
+            </div>
           </div>
+
+          {/* Liste des 11 blocs chronologiques */}
+          {filteredChronologyBlocks.length === 0 ? (
+            <div className="p-8 theme-surface border theme-border text-center space-y-3">
+              <p className="text-sm font-medium theme-text">
+                {language === 'fr'
+                  ? 'Aucun morceau ne correspond à votre recherche.'
+                  : 'No tracks match your current filter.'}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedEraGroup('all');
+                  setOnlyConfirmedSpotify(false);
+                }}
+                className="px-4 py-2 theme-accent-bg text-xs font-semibold uppercase tracking-wider"
+              >
+                {language === 'fr'
+                  ? 'Réinitialiser les filtres'
+                  : 'Reset filters'}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-10">
+              {filteredChronologyBlocks.map((block) => (
+                <div
+                  key={block.id}
+                  className="theme-surface border theme-border p-6 md:p-8 space-y-6"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b theme-border">
+                    <div className="space-y-1.5 max-w-3xl">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="px-2.5 py-0.5 theme-accent-bg text-[11px] font-bold uppercase tracking-wider tabular-nums">
+                          {language === 'fr'
+                            ? `CHAPITRE ${block.eraNumber}`
+                            : `CHAPTER ${block.eraNumber}`}
+                        </span>
+                        <span className="text-xs font-semibold theme-accent-text">
+                          {language === 'fr'
+                            ? block.subtitleFr
+                            : block.subtitleEn}
+                        </span>
+                      </div>
+                      <h4 className="font-display text-2xl sm:text-3xl md:text-4xl theme-text tracking-wide">
+                        {language === 'fr'
+                          ? block.periodTitleFr
+                          : block.periodTitleEn}
+                      </h4>
+                      <p className="text-xs md:text-sm theme-muted leading-relaxed">
+                        {language === 'fr'
+                          ? block.editorialContextFr
+                          : block.editorialContextEn}
+                      </p>
+                    </div>
+
+                    {block.projectSpotifyUrl && (
+                      <a
+                        href={block.projectSpotifyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 theme-bg border theme-border-strong text-xs font-semibold theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F] transition-colors duration-150 shrink-0"
+                      >
+                        <SocialBrandLogo
+                          platform="spotify"
+                          className="w-4 h-4 text-[#FF5A1F]"
+                        />
+                        <span>
+                          {language === 'fr'
+                            ? block.projectSpotifyLabelFr
+                            : block.projectSpotifyLabelEn}
+                        </span>
+                        <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Alerte méthodologique éventuelle (ex. distinction single 2018 / album 2019 pour Prends seulement ta part) */}
+                  {block.methodologyAlertFr && (
+                    <div className="p-4 theme-bg border border-[#FF5A1F]/50 flex items-start gap-3 text-xs">
+                      <AlertCircle
+                        className="w-4 h-4 theme-accent-text shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <p className="theme-text leading-relaxed">
+                        {language === 'fr'
+                          ? block.methodologyAlertFr
+                          : block.methodologyAlertEn}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Tableau / Liste des morceaux de la période */}
+                  <ul className="divide-y theme-border border-t border-b">
+                    {block.tracks.map((track, idx) => {
+                      const collab =
+                        language === 'fr'
+                          ? track.artistsOrCollabFr
+                          : track.artistsOrCollabEn;
+                      const dateLabel =
+                        language === 'fr'
+                          ? track.dateOrPeriodFr
+                          : track.dateOrPeriodEn;
+                      const sourceNote =
+                        language === 'fr'
+                          ? track.sourceNoteFr
+                          : track.sourceNoteEn;
+                      const isConfirmed =
+                        track.spotifyAction === 'listen_confirmed';
+
+                      return (
+                        <li
+                          key={track.id}
+                          className="py-3.5 px-2 sm:px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:theme-bg transition-colors duration-150"
+                        >
+                          <div className="flex items-baseline gap-3.5">
+                            <span className="text-xs font-semibold theme-accent-text w-7 shrink-0 tabular-nums">
+                              {track.trackNumber
+                                ? `#${String(track.trackNumber).padStart(2, '0')}`
+                                : String(idx + 1).padStart(2, '0')}
+                            </span>
+                            <div className="space-y-0.5">
+                              <div className="flex flex-wrap items-baseline gap-2">
+                                <span className="text-sm md:text-base font-semibold theme-text">
+                                  {track.title}
+                                </span>
+                                {collab && (
+                                  <span className="text-xs font-medium theme-accent-text">
+                                    — {collab}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2 text-[11px] theme-muted">
+                                <span>{dateLabel}</span>
+                                {sourceNote && (
+                                  <>
+                                    <span aria-hidden="true">·</span>
+                                    <span className="theme-text opacity-80">
+                                      {sourceNote}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2.5 self-end sm:self-center shrink-0">
+                            <a
+                              href={track.spotifyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors duration-150 whitespace-nowrap ${
+                                isConfirmed
+                                  ? 'theme-accent-bg hover:opacity-90'
+                                  : 'theme-bg border theme-border-strong theme-text hover:border-[#FF5A1F] hover:text-[#FF5A1F]'
+                              }`}
+                            >
+                              <SocialBrandLogo
+                                platform="spotify"
+                                className="w-3.5 h-3.5"
+                              />
+                              <span>
+                                {isConfirmed
+                                  ? language === 'fr'
+                                    ? 'Écouter'
+                                    : 'Listen'
+                                  : language === 'fr'
+                                  ? 'Rechercher'
+                                  : 'Search'}
+                              </span>
+                              <ArrowUpRight
+                                className="w-3.5 h-3.5"
+                                aria-hidden="true"
+                              />
+                            </a>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -391,7 +686,7 @@ export const DiscographySection: React.FC = () => {
             aria-modal="true"
             aria-labelledby="modal-project-title"
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl theme-surface border theme-border-strong p-6 md:p-8 shadow-2xl"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto theme-surface border theme-border-strong p-6 md:p-8 shadow-2xl"
           >
             <div className="flex items-start justify-between gap-4 pb-4 mb-6 border-b theme-border">
               <div>
@@ -452,17 +747,21 @@ export const DiscographySection: React.FC = () => {
 
               {selectedProject.documentedTracksFr.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider theme-muted mb-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider theme-muted mb-2.5">
                     {language === 'fr'
-                      ? 'Titres associés à cette période dans les sources :'
-                      : 'Tracks associated with this period in sources:'}
+                      ? `Pistes documentées (${selectedProject.documentedTracksFr.length}) :`
+                      : `Documented tracks (${selectedProject.documentedTracksEn.length}):`}
                   </p>
-                  <p className="text-sm theme-text">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm theme-text p-4 theme-bg border theme-border max-h-64 overflow-y-auto">
                     {(language === 'fr'
                       ? selectedProject.documentedTracksFr
                       : selectedProject.documentedTracksEn
-                    ).join(' · ')}
-                  </p>
+                    ).map((trk, idx) => (
+                      <li key={idx} className="py-1 border-b theme-border last:border-b-0">
+                        {trk}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
@@ -473,8 +772,8 @@ export const DiscographySection: React.FC = () => {
                 />
                 <span>
                   {language === 'fr'
-                    ? 'Note éditoriale : La liste complète des pistes, la durée exacte, le label et la pochette officielle seront affichés après transmission par l’équipe de l’artiste.'
-                    : 'Editorial note: Complete tracklist, exact runtime, label, and official cover art will be displayed once provided by the artist’s team.'}
+                    ? 'Note éditoriale : Les pochettes officielles haute définition et crédits complets de production seront affichés après transmission par l’équipe de l’artiste.'
+                    : 'Editorial note: High-definition official cover art and full production credits will be displayed once provided by the artist’s team.'}
                 </span>
               </div>
             </div>
@@ -489,6 +788,12 @@ export const DiscographySection: React.FC = () => {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-2.5 theme-accent-bg font-semibold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity duration-150 whitespace-nowrap shrink-0"
                   >
+                    <SocialBrandLogo
+                      platform={
+                        link.platform === 'Spotify' ? 'spotify' : 'deezer'
+                      }
+                      className="w-4 h-4"
+                    />
                     <span>
                       {language === 'fr' ? link.labelFr : link.labelEn}
                     </span>

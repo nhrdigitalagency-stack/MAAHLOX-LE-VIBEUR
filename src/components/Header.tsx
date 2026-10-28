@@ -12,6 +12,7 @@ import { getActivePublicSocials } from '../data/socials';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useCart } from '../context/CartContext';
 import { LanguageToggle } from './LanguageToggle';
+import { SocialBrandLogo } from './SocialBrandLogo';
 
 export const Header: React.FC = () => {
   const {
@@ -416,6 +417,10 @@ export const Header: React.FC = () => {
                       })`}
                       className="inline-flex items-center gap-2 px-3.5 py-2 theme-surface border theme-border-strong font-poppins text-xs font-medium theme-text hover:border-[#FF5A1F] transition-colors duration-150"
                     >
+                      <SocialBrandLogo
+                        platform={social.platform}
+                        className="w-4 h-4 theme-accent-text"
+                      />
                       <span>{social.platformName}</span>
                       <ArrowUpRight
                         className="w-3.5 h-3.5 theme-accent-text"

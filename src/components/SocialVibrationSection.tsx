@@ -5,69 +5,11 @@ import { ArrowUpRight, Info } from 'lucide-react';
 import {
   getActivePublicSocials,
   getPendingVerificationSocials,
-  SocialPlatformId,
 } from '../data/socials';
+import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const MonochromePlatformIcon: React.FC<{ platform: SocialPlatformId }> = ({
-  platform,
-}) => {
-  switch (platform) {
-    case 'youtube':
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-6 h-6"
-          aria-hidden="true"
-        >
-          <rect x="2" y="4" width="20" height="16" rx="4" />
-          <polygon points="10 9 15 12 10 15 10 9" fill="currentColor" />
-        </svg>
-      );
-    case 'facebook':
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-6 h-6"
-          aria-hidden="true"
-        >
-          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-        </svg>
-      );
-    case 'soundcloud':
-      return (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-6 h-6"
-          aria-hidden="true"
-        >
-          <path d="M3 14v3" />
-          <path d="M6 12v5" />
-          <path d="M9 10v7" />
-          <path d="M12 17h6a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 12 7v10Z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
-};
 
 export const SocialVibrationSection: React.FC = () => {
   const { language, environmentMode } = useAppSettings();
@@ -136,12 +78,12 @@ export const SocialVibrationSection: React.FC = () => {
 
           <p className="text-sm md:text-base theme-muted max-w-md leading-relaxed">
             {language === 'fr'
-              ? 'Accès direct aux canaux en ligne documentés. Aucun faux flux social ni compteur d’abonnés non synchronisé n’est affiché.'
-              : 'Direct access to documented online channels. No simulated social feeds or unsynchronized follower counts are displayed.'}
+              ? 'Accès direct aux canaux en ligne documentés avec leurs logos officiels. Aucun faux flux social ni compteur d’abonnés non synchronisé n’est affiché.'
+              : 'Direct access to documented online channels with their official logos. No simulated social feeds or unsynchronized follower counts are displayed.'}
           </p>
         </div>
 
-        {/* Cartes sociales asymétriques — chaque carte est une vraie ancre HTML <a> */}
+        {/* Cartes sociales asymétriques — chaque carte est une vraie ancre HTML <a> avec le logo du réseau social */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {activeSocials.map((social, idx) => (
             <a
@@ -159,9 +101,12 @@ export const SocialVibrationSection: React.FC = () => {
               className={`social-vibration-card ${social.cardSpanClass} group block p-6 md:p-8 theme-surface border theme-border hover:border-[#FF5A1F] transition-all duration-250 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-[#FF5A1F]`}
             >
               <div className="flex items-start justify-between gap-4 mb-8">
-                <div className="inline-flex items-center gap-3">
-                  <span className="inline-flex items-center justify-center w-12 h-12 theme-bg border theme-border theme-text group-hover:text-[#FF5A1F] group-hover:border-[#FF5A1F] transition-colors duration-200">
-                    <MonochromePlatformIcon platform={social.platform} />
+                <div className="inline-flex items-center gap-3.5">
+                  <span className="inline-flex items-center justify-center w-12 h-12 theme-bg border theme-border-strong theme-text group-hover:text-[#FF5A1F] group-hover:border-[#FF5A1F] transition-colors duration-200 shrink-0">
+                    <SocialBrandLogo
+                      platform={social.platform}
+                      className="w-6 h-6"
+                    />
                   </span>
                   <div>
                     <span className="block text-xs font-semibold uppercase tracking-widest theme-muted">
@@ -195,8 +140,12 @@ export const SocialVibrationSection: React.FC = () => {
               </div>
 
               <div className="mt-6 pt-4 border-t theme-border flex flex-wrap items-center justify-between gap-2 text-xs theme-muted">
-                <span className="font-medium theme-text">
-                  {social.handleOrChannel}
+                <span className="inline-flex items-center gap-2 font-medium theme-text">
+                  <SocialBrandLogo
+                    platform={social.platform}
+                    className="w-3.5 h-3.5 theme-accent-text"
+                  />
+                  <span>{social.handleOrChannel}</span>
                 </span>
                 <span className="truncate max-w-[280px] sm:max-w-md opacity-75">
                   {social.url}
@@ -206,7 +155,7 @@ export const SocialVibrationSection: React.FC = () => {
           ))}
         </div>
 
-        {/* En mode preview uniquement : transparence sur Instagram candidat et TikTok non confirmé */}
+        {/* En mode preview uniquement : transparence sur Instagram candidat et TikTok non confirmé (sans afficher l'icône TikTok comme exigé) */}
         {environmentMode === 'preview' && pendingSocials.length > 0 && (
           <div className="mt-8 p-5 md:p-6 theme-surface border theme-border space-y-4">
             <div className="flex items-start gap-3">
@@ -235,8 +184,14 @@ export const SocialVibrationSection: React.FC = () => {
                   className="p-4 theme-bg border theme-border text-xs space-y-1.5"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold theme-text">
-                      {item.platformName}
+                    <span className="inline-flex items-center gap-2 font-semibold theme-text">
+                      {item.platform === 'instagram' && (
+                        <SocialBrandLogo
+                          platform="instagram"
+                          className="w-4 h-4 theme-accent-text"
+                        />
+                      )}
+                      <span>{item.platformName}</span>
                     </span>
                     <span className="theme-accent-text font-medium">
                       {item.statusBadge[language]}

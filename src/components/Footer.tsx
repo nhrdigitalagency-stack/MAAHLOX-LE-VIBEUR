@@ -3,18 +3,16 @@ import {
   ArrowUp,
   ArrowUpRight,
   Eye,
-  Facebook,
   Globe,
   Moon,
-  Radio,
   ShieldCheck,
   Sun,
-  Youtube,
 } from 'lucide-react';
 import { siteConfig } from '../data/siteConfig';
 import { artistData } from '../data/artist';
 import { getActivePublicSocials, SocialPlatformId } from '../data/socials';
 import { DecorativeAudioVisualizer } from './DecorativeAudioVisualizer';
+import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 export const Footer: React.FC = () => {
@@ -33,17 +31,9 @@ export const Footer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const renderSocialIcon = (platform: SocialPlatformId) => {
-    switch (platform) {
-      case 'youtube':
-        return <Youtube className="w-3.5 h-3.5" aria-hidden="true" />;
-      case 'facebook':
-        return <Facebook className="w-3.5 h-3.5" aria-hidden="true" />;
-      case 'soundcloud':
-      default:
-        return <Radio className="w-3.5 h-3.5" aria-hidden="true" />;
-    }
-  };
+  const renderSocialIcon = (platform: SocialPlatformId) => (
+    <SocialBrandLogo platform={platform} className="w-4 h-4" />
+  );
 
   return (
     <footer

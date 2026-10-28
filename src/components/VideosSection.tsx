@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Film, Play, Tv, X } from 'lucide-react';
+import { ArrowUpRight, Film, Play, X } from 'lucide-react';
 import { VideoClip, videosData } from '../data/videos';
 import { socialsData } from '../data/socials';
+import { SocialBrandLogo } from './SocialBrandLogo';
 import { useAppSettings } from '../context/AppSettingsContext';
 
 export const VideosSection: React.FC = () => {
@@ -283,9 +284,9 @@ export const VideosSection: React.FC = () => {
           <div className="p-6 md:p-8 theme-bg border theme-border flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 theme-surface border theme-border-strong flex items-center justify-center shrink-0">
-                <Tv
-                  className="w-5 h-5 theme-accent-text"
-                  aria-hidden="true"
+                <SocialBrandLogo
+                  platform="youtube"
+                  className="w-6 h-6 theme-accent-text"
                 />
               </div>
               <div className="space-y-1">
